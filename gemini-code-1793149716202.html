@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JR東日本 路線一覧データベース</title>
+  <style>
+    :root {
+      --primary-color: #008000;
+      --border-color: #d0d7de;
+      --bg-header: #f6f8fa;
+      --text-color: #1f2328;
+      --text-muted: #656d76;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: #f4f6f8; line-height: 1.5; padding: 30px 15px; }
+    .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+    
+    header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 25px; }
+    h1 { font-size: 1.8rem; color: var(--primary-color); font-weight: 700; }
+    p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; }
+
+    .loading { text-align: center; padding: 50px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
+
+    /* カテゴリ見出し */
+    .section-title { font-size: 1.2rem; font-weight: 700; margin: 30px 0 15px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
+
+    /* 路線カードグリッド */
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    
+    /* 路線カード */
+    .route-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 20px;
+      text-decoration: none;
+      color: var(--text-color);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .route-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-color);
+      background-color: #f8fafc;
+    }
+
+    .route-info { display: flex; align-items: center; gap: 14px; }
+    
+    /* ナンバリング記号画像 */
+    .route-symbol {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .route-name { font-size: 1.1rem; font-weight: 700; }
+    .route-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    
+    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>JR東日本 路線一覧データベース</h1>
+    <p class="subtitle">ご覧になりたい路線を選択してください。</p>
+  </header>
+
+  <div id="loading" class="loading">路線一覧データを読み込み中...</div>
+  <div id="routeContainer"></div>
+</div>
+
+<script>
+  // ★作成した「路線一覧用スプレッドシート」のGAS API URLをここに貼ってください
+  const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
+
+  fetch(ROUTE_GAS_API_URL)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('loading').style.display = 'none';
+      renderRoutes(data);
+    })
+    .catch(err => {
+      console.error('エラー:', err);
+      document.getElementById('loading').innerHTML = '<span style="color:red;">データの読み込みに失敗しました。</span>';
+    });
+
+  function renderRoutes(routes) {
+    // カテゴリごとにグループ化
+    const grouped = {};
+    routes.forEach(r => {
+      const cat = r.category || 'その他路線';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(r);
+    });
+
+    const container = document.getElementById('routeContainer');
+    container.innerHTML = '';
+
+    // カテゴリごとにHTMLを生成
+    Object.keys(grouped).forEach(cat => {
+      const catTitle = document.createElement('div');
+      catTitle.className = 'section-title';
+      catTitle.textContent = cat;
+
+      const grid = document.createElement('div');
+      grid.className = 'route-grid';
+
+      grid.innerHTML = grouped[cat].map(r => {
+        // ナンバリング画像の設定（"-" や未設定の場合は画像を出さない）
+        const hasImg = r.numbering && r.numbering.trim() !== '-' && r.numbering.trim() !== '';
+        const imgTag = hasImg ? `<img src="${r.numbering.trim()}.png" alt="${r.numbering}" class="route-symbol" onerror="this.style.display='none'">` : '';
+
+        return `
+          <a href="${r.html_file || '#'}" class="route-card">
+            <div class="route-info">
+              ${imgTag}
+              <div>
+                <div class="route-name">${r.line_name || '-'}</div>
+                ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
+              </div>
+            </div>
+            <div class="arrow">›</div>
+          </a>
+        `;
+      }).join('');
+
+      container.appendChild(catTitle);
+      container.appendChild(grid);
+    });
+  }
+</script>
+
+</body>
+</html>
