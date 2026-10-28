@@ -19,11 +19,28 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: #f4f6f8; line-height: 1.5; padding: 30px 15px; }
     .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
     
-    header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 25px; }
+    header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 20px; }
     h1 { font-size: 1.8rem; color: var(--primary-color); font-weight: 700; }
     p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; }
 
+    /* 検索バーエリア */
+    .search-section { margin-bottom: 25px; }
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0,128,0,0.1);
+    }
+
     .loading { text-align: center; padding: 50px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
+    .no-result { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; }
 
     /* カテゴリ見出し */
     .section-title { font-size: 1.2rem; font-weight: 700; margin: 30px 0 15px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
@@ -71,30 +88,55 @@
 
 <div class="container">
   <header>
-    <h1>JR東日本 路線一覧データベース</h1>
+    <h1>JR東日本 路線一覧</h1>
     <p class="subtitle">ご覧になりたい路線を選択してください。</p>
   </header>
+
+  <!-- 検索バー -->
+  <div class="search-section">
+    <input type="text" id="searchInput" class="search-input" placeholder="路線名（例：山手線、中央線）や区間で検索..." oninput="filterRoutes()">
+  </div>
 
   <div id="loading" class="loading">路線一覧データを読み込み中...</div>
   <div id="routeContainer"></div>
 </div>
 
 <script>
-  // ★作成した「路線一覧用スプレッドシート」のGAS API URLをここに貼ってください
+  // ★路線一覧用スプレッドシートのGAS API URLをここに貼ってください
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
+
+  let allRoutes = [];
 
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
+      allRoutes = data;
       document.getElementById('loading').style.display = 'none';
-      renderRoutes(data);
+      renderRoutes(allRoutes);
     })
     .catch(err => {
       console.error('エラー:', err);
       document.getElementById('loading').innerHTML = '<span style="color:red;">データの読み込みに失敗しました。</span>';
     });
 
+  function filterRoutes() {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allRoutes.filter(r => {
+      const text = `${r.line_name || ''} ${r.section_info || ''} ${r.category || ''} ${r.numbering || ''}`.toLowerCase();
+      return text.includes(keyword);
+    });
+    renderRoutes(filtered);
+  }
+
   function renderRoutes(routes) {
+    const container = document.getElementById('routeContainer');
+    container.innerHTML = '';
+
+    if (routes.length === 0) {
+      container.innerHTML = '<div class="no-result">一致する路線が見つかりませんでした。</div>';
+      return;
+    }
+
     // カテゴリごとにグループ化
     const grouped = {};
     routes.forEach(r => {
@@ -102,9 +144,6 @@
       if (!grouped[cat]) grouped[cat] = [];
       grouped[cat].push(r);
     });
-
-    const container = document.getElementById('routeContainer');
-    container.innerHTML = '';
 
     // カテゴリごとにHTMLを生成
     Object.keys(grouped).forEach(cat => {
@@ -116,7 +155,6 @@
       grid.className = 'route-grid';
 
       grid.innerHTML = grouped[cat].map(r => {
-        // ナンバリング画像の設定（"-" や未設定の場合は画像を出さない）
         const hasImg = r.numbering && r.numbering.trim() !== '-' && r.numbering.trim() !== '';
         const imgTag = hasImg ? `<img src="${r.numbering.trim()}.png" alt="${r.numbering}" class="route-symbol" onerror="this.style.display='none'">` : '';
 
