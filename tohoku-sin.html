@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR駅詳細データベース</title>
+  <title>東北新幹線  -  JR東日本駅情報一覧</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -132,7 +132,7 @@
       <a href="index.html" class="back-btn">‹ 路線一覧</a>
       <h1>
         <img src="JY.png" alt="" class="line-symbol" onerror="this.style.display='none'">
-        山手線 駅詳細データベース
+        東北新幹線 駅詳細一覧
       </h1>
     </div>
     <div class="view-mode-toggle">
@@ -170,7 +170,7 @@
     </div>
   </div>
 
-  <div id="loadingView" class="loading">Googleスプレッドシートから最新データを読み込み中...</div>
+  <div id="loadingView" class="loading">データを読み込み中...</div>
 
   <!-- PC用 テーブル表示 -->
   <div class="table-container" id="tableView" style="display: none;">
@@ -219,7 +219,7 @@
   const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
   let allStations = [];
-  const currentLine = 'yamanote';
+  const currentLine = 'tohoku_shinkansen';
   let currentBranch = '';
   let currentViewMode = 'table';
 
