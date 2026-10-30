@@ -138,7 +138,7 @@
       <a href="index.html" class="back-btn">‹ 路線一覧</a>
       <h1>
         <img src="新.png" alt="" class="line-symbol" onerror="this.style.display='none'">
-        東北新幹線 駅一覧
+      　東北新幹線 駅一覧
       </h1>
     </div>
     <div class="view-mode-toggle">
@@ -169,7 +169,7 @@
   <div class="filter-section">
     <input type="text" id="searchInput" class="search-input" placeholder="駅名・かな・所在地・ナンバリング等で検索..." oninput="filterData()">
     <button class="filter-toggle-btn" onclick="toggleAdvancedFilter()">
-      ⚙️ 詳細絞り込み
+      詳細絞り込み
     </button>
   </div>
 
@@ -189,7 +189,7 @@
     </div>
   </div>
 
-  <div id="loadingView" class="loading">Googleスプレッドシートから最新データを読み込み中...</div>
+  <div id="loadingView" class="loading">読み込み中...</div>
 
   <!-- PC用 テーブル表示 -->
   <div class="table-container" id="tableView" style="display: none;">
@@ -255,15 +255,15 @@
         document.getElementById('sumStations').textContent = lineInfo.station_count || '-';
         document.getElementById('sumAvgDistance').textContent = lineInfo.avg_distance || '-';
         document.getElementById('sumMaxSpeed').textContent = lineInfo.max_speed || '-';
-        document.getElementById('sumOpeningDate').textContent = formatDate(lineInfo.opening_date);
+        document.getElementById('sumOpeningDate').textContent = lineInfo.opening_date || '-';
 
-  // 全通年月日が存在する場合のみ、概要グリッドに項目を動的追加
-  if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
-  const summaryGrid = document.getElementById('summaryGrid');
-  const fullOpeningItem = document.createElement('div');
-  fullOpeningItem.className = 'summary-item';
-  fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${lineInfo.full_opening_date}</span>`;
-  summaryGrid.appendChild(fullOpeningItem);
+        // 全通年月日が存在する場合のみ、概要グリッドに項目を動的追加
+        if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
+          const summaryGrid = document.getElementById('summaryGrid');
+          const fullOpeningItem = document.createElement('div');
+          fullOpeningItem.className = 'summary-item';
+          fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${lineInfo.full_opening_date}</span>`;
+          summaryGrid.appendChild(fullOpeningItem);
         }
       }
     })
