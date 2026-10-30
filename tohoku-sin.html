@@ -255,19 +255,37 @@
         document.getElementById('sumStations').textContent = lineInfo.station_count || '-';
         document.getElementById('sumAvgDistance').textContent = lineInfo.avg_distance || '-';
         document.getElementById('sumMaxSpeed').textContent = lineInfo.max_speed || '-';
-        document.getElementById('sumOpeningDate').textContent = lineInfo.opening_date || '-';
+        document.getElementById('sumOpeningDate').textContent = formatDate(lineInfo.opening_date);
 
-        // 全通年月日が存在する場合のみ、概要グリッドに項目を動的追加
-        if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
-          const summaryGrid = document.getElementById('summaryGrid');
-          const fullOpeningItem = document.createElement('div');
-          fullOpeningItem.className = 'summary-item';
-          fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${lineInfo.full_opening_date}</span>`;
-          summaryGrid.appendChild(fullOpeningItem);
+  // 全通年月日が存在する場合のみ、概要グリッドに項目を動的追加
+  if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
+  const summaryGrid = document.getElementById('summaryGrid');
+  const fullOpeningItem = document.createElement('div');
+  fullOpeningItem.className = 'summary-item';
+  fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${lineInfo.full_opening_date}</span>`;
+  summaryGrid.appendChild(fullOpeningItem);
         }
       }
     })
     .catch(err => console.error('路線概要データ取得エラー:', err));
+
+  // 日付文字列を「YYYY年M月D日」の形式に綺麗に変換する関数
+function formatDate(isoString) {
+  if (!isoString) return '-';
+  
+  const date = new Date(isoString);
+  
+  // 無効な日付だった場合はそのまま返す
+  if (isNaN(date.getTime())) return isoString;
+
+  // 日本のロケールで年・月・日を取得
+  return date.toLocaleDateString('ja-JP', {
+    timeZone: 'Asia/Tokyo', // 日本時間に合わせることで日付のズレを防ぐ
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
 
   // 2. 駅詳細データの読み込み
   fetch(STATION_GAS_API_URL)
