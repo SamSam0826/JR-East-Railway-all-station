@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>東北新幹線｜JR東日本駅一覧</title>
+  <title>JR駅詳細データベース</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -21,13 +21,13 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: #f4f6f8; line-height: 1.5; padding: 20px 15px; }
     .container { max-width: 1600px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
     
-    /* ヘッダー全体構造 */
+    /* ヘッダー全体構造（上下2段で崩れを完全防止・常に左揃え） */
     header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
     
     /* 上段（戻るボタンと表示モード切替） */
     .header-top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; }
     
-    /* 「‹ 路線一覧」ボタン：絶対に折り返さないよう固定 */
+    /* 「‹ 路線一覧」ボタン */
     .back-btn {
       text-decoration: none;
       color: var(--text-muted);
@@ -41,14 +41,14 @@
       border-radius: 6px;
       border: 1px solid var(--border-color);
       transition: all 0.2s;
-      white-space: nowrap; /* 折返し防止 */
+      white-space: nowrap;
       flex-shrink: 0;
     }
     .back-btn:hover { background: #e4e8ec; color: var(--text-color); }
 
-    /* タイトル（ナンバリング画像＋路線名） */
+    /* タイトル（ナンバリング画像＋路線名・常に左揃え） */
     h1 {
-      font-size: clamp(1.1rem, 4vw, 1.5rem); /* スマホ画面で自動的にフィット */
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
       color: var(--text-color);
       font-weight: 700;
       display: flex;
@@ -56,24 +56,47 @@
       gap: 10px;
       margin: 0;
       line-height: 1.3;
-      word-break: keep-all; /* 単語の途中での不自然な改行を抑止 */
+      text-align: left;
     }
     .line-symbol { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
 
-    /* 路線概要パネル */
+    /* 路線概要パネル（折り畳み式 <details>） */
     .route-summary-panel {
       background: var(--bg-header);
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 16px 20px;
+      padding: 14px 18px;
       margin-bottom: 20px;
       box-shadow: var(--shadow-sm);
     }
-    .summary-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .summary-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+    .summary-title::-webkit-details-marker { display: none; }
+    .summary-title::after {
+      content: '＋ 展開';
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: normal;
+    }
+    details[open] .summary-title::after {
+      content: '－ 閉じる';
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
+      gap: 10px;
+      margin-top: 12px;
     }
     .summary-item { background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #e1e4e8; display: flex; flex-direction: column; }
     .summary-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
@@ -161,22 +184,9 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* PC以上の広い画面のとき（横並びレイアウト） */
-    @media (min-width: 769px) {
-      header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .header-top-bar {
-        width: auto;
-        justify-content: flex-start;
-        gap: 16px;
-      }
-    }
-
-    /* スマホ表示のとき */
+    /* スマホ表示のとき（表/カード切替タブを完全に非表示にする） */
     @media (max-width: 768px) {
+      .view-mode-toggle { display: none !important; }
       .table-container { display: none !important; }
       .card-grid-container { display: flex !important; flex-direction: column; }
     }
@@ -186,7 +196,7 @@
 
 <div class="container">
   <header>
-    <!-- 上段：戻るボタンと表示切替ボタン -->
+    <!-- 上段：戻るボタンと、PC用表示切替タブ -->
     <div class="header-top-bar">
       <a href="index.html" class="back-btn">‹ 路線一覧</a>
       <div class="view-mode-toggle">
@@ -195,16 +205,16 @@
       </div>
     </div>
     
-    <!-- 下段：ナンバリング画像とタイトル -->
+    <!-- 下段：ナンバリング画像とタイトル（常に左揃え） -->
     <h1>
       <img src="新.png" alt="" class="line-symbol" onerror="this.style.display='none'">
       東北新幹線(東京～新青森)
     </h1>
   </header>
 
-  <!-- 路線概要スペックパネル -->
-  <div class="route-summary-panel" id="summaryPanel">
-    <div class="summary-title">📌路線概要</div>
+  <!-- 路線概要スペックパネル（スマホでは折り畳み、PCでは自動展開） -->
+  <details id="summaryDetails" class="route-summary-panel">
+    <summary class="summary-title">📌 路線概要</summary>
     <div class="summary-grid" id="summaryGrid">
       <div class="summary-item"><span class="summary-label">営業キロ</span><span class="summary-val" id="sumDistance">-</span></div>
       <div class="summary-item"><span class="summary-label">駅数</span><span class="summary-val" id="sumStations">-</span></div>
@@ -212,7 +222,7 @@
       <div class="summary-item"><span class="summary-label">最高速度</span><span class="summary-val" id="sumMaxSpeed">-</span></div>
       <div class="summary-item"><span class="summary-label">開業年月日</span><span class="summary-val" id="sumOpeningDate">-</span></div>
     </div>
-  </div>
+  </details>
 
   <!-- 支線タブ -->
   <div id="branchTabContainer" class="branch-tabs-container">
@@ -269,7 +279,7 @@
           <th>点字運賃表</th>
           <th>公式HP</th>
           <th>マップ</th>
-          <th>Wikipedia</th>
+          <th>Wiki</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -293,13 +303,18 @@
   const STATION_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
   const currentLine = 'tohoku_shinkansen';
-  const currentFileName = location.pathname.split('/').pop() || 'tohoku-sin.html';
+  const currentFileName = location.pathname.split('/').pop() || 'tohoku-sinkansen.html';
 
   let allStations = [];
   let currentBranch = '';
   let currentViewMode = 'table';
 
-  // 日付文字列を「YYYY年M月D日」の形式に綺麗に変換する関数（ISO8601対策）
+  // PC表示のときだけ「路線概要」を最初から開いておく（スマホでは折り畳み状態）
+  if (window.innerWidth > 768) {
+    document.getElementById('summaryDetails').setAttribute('open', 'true');
+  }
+
+  // 日付フォーマット関数
   function formatDate(isoString) {
     if (!isoString) return '-';
     const date = new Date(isoString);
