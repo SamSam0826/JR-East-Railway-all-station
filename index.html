@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR東日本 路線一覧データベース</title>
+  <title>JR東日本 路線一覧</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -23,40 +23,25 @@
     h1 { font-size: 1.8rem; color: var(--primary-color); font-weight: 700; }
     p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; }
 
-    /* 検索バーエリア */
     .search-section { margin-bottom: 25px; }
-    .search-input {
-      width: 100%;
-      padding: 12px 16px;
-      font-size: 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .search-input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(0,128,0,0.1);
-    }
+    .search-input { width: 100%; padding: 12px 16px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,128,0,0.1); }
 
     .loading { text-align: center; padding: 50px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
     .no-result { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; }
 
-    /* カテゴリ見出し */
     .section-title { font-size: 1.2rem; font-weight: 700; margin: 30px 0 15px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
 
-    /* 路線カードグリッド */
-    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 18px; }
     
-    /* 路線カード */
     .route-card {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
       background: #fff;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px 20px;
+      border-radius: 10px;
+      padding: 18px;
       text-decoration: none;
       color: var(--text-color);
       box-shadow: var(--shadow-sm);
@@ -69,19 +54,28 @@
       background-color: #f8fafc;
     }
 
-    .route-info { display: flex; align-items: center; gap: 14px; }
-    
-    /* ナンバリング記号画像 */
-    .route-symbol {
-      height: 38px;
-      width: auto;
-      object-fit: contain;
-    }
+    .route-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .route-info { display: flex; align-items: center; gap: 12px; }
+    .route-symbol { height: 38px; width: auto; object-fit: contain; }
+    .route-name { font-size: 1.15rem; font-weight: 700; }
+    .route-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; }
 
-    .route-name { font-size: 1.1rem; font-weight: 700; }
-    .route-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
-    
-    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; }
+    /* 路線概要スペックグリッド */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 10px;
+      font-size: 0.78rem;
+      background: #f8f9fa;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #ebedf0;
+      margin-top: 8px;
+    }
+    .spec-item { display: flex; flex-direction: column; }
+    .spec-label { color: var(--text-muted); font-size: 0.7rem; font-weight: 600; }
+    .spec-val { font-weight: 700; color: var(--text-color); }
   </style>
 </head>
 <body>
@@ -92,17 +86,15 @@
     <p class="subtitle">ご覧になりたい路線を選択してください。</p>
   </header>
 
-  <!-- 検索バー -->
   <div class="search-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="路線名（例：山手線、中央線）や区間で検索..." oninput="filterRoutes()">
+    <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・カテゴリ等で検索..." oninput="filterRoutes()">
   </div>
 
-  <div id="loading" class="loading">路線一覧データを読み込み中...</div>
+  <div id="loading" class="loading">読み込み中...</div>
   <div id="routeContainer"></div>
 </div>
 
 <script>
-  // ★路線一覧用スプレッドシートのGAS API URLをここに貼ってください
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
 
   let allRoutes = [];
@@ -137,7 +129,6 @@
       return;
     }
 
-    // カテゴリごとにグループ化
     const grouped = {};
     routes.forEach(r => {
       const cat = r.category || 'その他路線';
@@ -145,7 +136,6 @@
       grouped[cat].push(r);
     });
 
-    // カテゴリごとにHTMLを生成
     Object.keys(grouped).forEach(cat => {
       const catTitle = document.createElement('div');
       catTitle.className = 'section-title';
@@ -160,14 +150,26 @@
 
         return `
           <a href="${r.html_file || '#'}" class="route-card">
-            <div class="route-info">
-              ${imgTag}
-              <div>
-                <div class="route-name">${r.line_name || '-'}</div>
-                ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
+            <div>
+              <div class="route-header">
+                <div class="route-info">
+                  ${imgTag}
+                  <div>
+                    <div class="route-name">${r.line_name || '-'}</div>
+                    ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
+                  </div>
+                </div>
+                <div class="arrow">›</div>
+              </div>
+
+              <div class="specs-grid">
+                <div class="spec-item"><span class="spec-label">営業キロ</span><span class="spec-val">${r.distance || '-'}</span></div>
+                <div class="spec-item"><span class="spec-label">駅数</span><span class="spec-val">${r.station_count || '-'}</span></div>
+                <div class="spec-item"><span class="spec-label">平均駅間距離</span><span class="spec-val">${r.avg_distance || '-'}</span></div>
+                <div class="spec-item"><span class="spec-label">最高速度</span><span class="spec-val">${r.max_speed || '-'}</span></div>
+                <div class="spec-item" style="grid-column: span 2;"><span class="spec-label">開業年月日</span><span class="spec-val">${r.opening_date || '-'}</span></div>
               </div>
             </div>
-            <div class="arrow">›</div>
           </a>
         `;
       }).join('');
