@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR東日本 路線一覧</title>
+  <title>JR東日本｜路線一覧</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -61,7 +61,6 @@
     .route-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
     .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; }
 
-    /* 路線概要スペックグリッド */
     .specs-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -83,7 +82,7 @@
 <div class="container">
   <header>
     <h1>JR東日本 路線一覧</h1>
-    <p class="subtitle">ご覧になりたい路線を選択してください。</p>
+    <p class="subtitle">ご覧になりたい路線を選択すると、その路線の駅一覧や駅の詳細を見ることができます。</p>
   </header>
 
   <div class="search-section">
@@ -148,6 +147,12 @@
         const hasImg = r.numbering && r.numbering.trim() !== '-' && r.numbering.trim() !== '';
         const imgTag = hasImg ? `<img src="${r.numbering.trim()}.png" alt="${r.numbering}" class="route-symbol" onerror="this.style.display='none'">` : '';
 
+        // 全通日が存在する場合のみHTMLを生成
+        const hasFullOpening = r.full_opening_date && r.full_opening_date.trim() !== '' && r.full_opening_date.trim() !== '-';
+        const fullOpeningHTML = hasFullOpening ? `
+          <div class="spec-item"><span class="spec-label">全通年月日</span><span class="spec-val">${r.full_opening_date}</span></div>
+        ` : '';
+
         return `
           <a href="${r.html_file || '#'}" class="route-card">
             <div>
@@ -167,7 +172,8 @@
                 <div class="spec-item"><span class="spec-label">駅数</span><span class="spec-val">${r.station_count || '-'}</span></div>
                 <div class="spec-item"><span class="spec-label">平均駅間距離</span><span class="spec-val">${r.avg_distance || '-'}</span></div>
                 <div class="spec-item"><span class="spec-label">最高速度</span><span class="spec-val">${r.max_speed || '-'}</span></div>
-                <div class="spec-item" style="grid-column: span 2;"><span class="spec-label">開業年月日</span><span class="spec-val">${r.opening_date || '-'}</span></div>
+                <div class="spec-item"><span class="spec-label">開業年月日</span><span class="spec-val">${r.opening_date || '-'}</span></div>
+                ${fullOpeningHTML}
               </div>
             </div>
           </a>
