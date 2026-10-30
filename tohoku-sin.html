@@ -269,24 +269,6 @@
     })
     .catch(err => console.error('路線概要データ取得エラー:', err));
 
-  // 日付文字列を「YYYY年M月D日」の形式に綺麗に変換する関数
-function formatDate(isoString) {
-  if (!isoString) return '-';
-  
-  const date = new Date(isoString);
-  
-  // 無効な日付だった場合はそのまま返す
-  if (isNaN(date.getTime())) return isoString;
-
-  // 日本のロケールで年・月・日を取得
-  return date.toLocaleDateString('ja-JP', {
-    timeZone: 'Asia/Tokyo', // 日本時間に合わせることで日付のズレを防ぐ
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
-
   // 2. 駅詳細データの読み込み
   fetch(STATION_GAS_API_URL)
     .then(res => res.json())
