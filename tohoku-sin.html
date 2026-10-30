@@ -21,7 +21,6 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: #f4f6f8; line-height: 1.5; padding: 20px 15px; }
     .container { max-width: 1600px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
     
-    /* ヘッダー */
     header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
     .header-title-area { display: flex; align-items: center; gap: 12px; }
     h1 { font-size: 1.5rem; color: var(--text-color); font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -49,19 +48,16 @@
     .summary-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
     .summary-val { font-size: 1rem; font-weight: 700; color: var(--text-color); margin-top: 2px; }
 
-    /* 表示モード切替ボタン */
     .view-mode-toggle { display: flex; background: #eaeef2; border-radius: 8px; padding: 3px; border: 1px solid var(--border-color); }
     .view-btn { border: none; background: transparent; padding: 6px 16px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; font-size: 0.85rem; color: var(--text-muted); }
     .view-btn.active { background: #fff; color: var(--primary-dark); box-shadow: var(--shadow-sm); }
 
-    /* 支線タブ */
     .branch-tabs-container { display: none; margin-bottom: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
     .branch-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .branch-btn { background: #f0f3f6; border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.2s; font-size: 0.85rem; color: var(--text-color); }
     .branch-btn:hover { background: #e4e8ec; }
     .branch-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: var(--shadow-sm); }
 
-    /* 検索・絞り込みバー */
     .filter-section { background: var(--bg-header); padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
     .search-input { padding: 9px 14px; font-size: 0.9rem; border: 1px solid var(--border-color); border-radius: 6px; flex: 1; min-width: 220px; outline: none; background: #fff; }
     .search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,128,0,0.1); }
@@ -69,16 +65,13 @@
     .filter-toggle-btn { background: #fff; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-color); transition: 0.2s; }
     .filter-toggle-btn:hover { background: #f0f3f6; }
 
-    /* 詳細絞り込みパネル */
     .advanced-filter-panel { display: none; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
     .advanced-filter-panel.active { display: block; }
     .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; font-size: 0.85rem; }
     .filter-grid label { display: flex; align-items: center; gap: 6px; cursor: pointer; background: #f8f9fa; padding: 6px 10px; border-radius: 4px; border: 1px solid #e1e4e8; font-weight: 500; }
 
-    /* ローディング */
     .loading { text-align: center; padding: 40px; font-weight: 600; color: var(--primary-dark); font-size: 1rem; }
 
-    /* 表スタイリング */
     .table-container { overflow: auto; max-height: 70vh; max-width: 100%; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow-sm); background: #fff; }
     table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.82rem; white-space: nowrap; }
     th, td { border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 9px 10px; text-align: center; background: #fff; }
@@ -97,7 +90,6 @@
     .link-btn { color: #0969da; text-decoration: none; font-weight: 600; }
     .link-btn:hover { text-decoration: underline; }
 
-    /* カード表示 */
     .card-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
     .station-card { border: 1px solid var(--border-color); border-left: 6px solid var(--primary-color); padding: 16px; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; }
     .station-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
@@ -121,7 +113,6 @@
 
     .card-links { display: flex; gap: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border-color); padding-top: 10px; }
 
-    /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(2px); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #fff; border-radius: 12px; width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; box-shadow: var(--shadow-md); animation: modalIn 0.2s ease-out; }
@@ -165,6 +156,7 @@
       <div class="summary-item"><span class="summary-label">平均駅間距離</span><span class="summary-val" id="sumAvgDistance">-</span></div>
       <div class="summary-item"><span class="summary-label">最高速度</span><span class="summary-val" id="sumMaxSpeed">-</span></div>
       <div class="summary-item"><span class="summary-label">開業年月日</span><span class="summary-val" id="sumOpeningDate">-</span></div>
+      <!-- 全通日がある場合のみJSでここに動的追加されます -->
     </div>
   </div>
 
@@ -197,7 +189,7 @@
     </div>
   </div>
 
-  <div id="loadingView" class="loading">読み込み中...</div>
+  <div id="loadingView" class="loading">Googleスプレッドシートから最新データを読み込み中...</div>
 
   <!-- PC用 テーブル表示 -->
   <div class="table-container" id="tableView" style="display: none;">
@@ -243,12 +235,12 @@
 </div>
 
 <script>
-  // 路線一覧用GAS URL
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
-  // 駅詳細用GAS URL
   const STATION_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
-  const currentLine = 'tohoku_shinkansen'; // 該当するline_idを指定
+  const currentLine = 'tohoku_shinkansen';
+  const currentFileName = location.pathname.split('/').pop() || 'tohoku-sin.html';
+
   let allStations = [];
   let currentBranch = '';
   let currentViewMode = 'table';
@@ -257,13 +249,22 @@
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
-      const lineInfo = data.find(r => r.html_file === 'tohoku-sin.html' || r.numbering === '-');
+      const lineInfo = data.find(r => r.html_file === currentFileName);
       if (lineInfo) {
         document.getElementById('sumDistance').textContent = lineInfo.distance || '-';
         document.getElementById('sumStations').textContent = lineInfo.station_count || '-';
         document.getElementById('sumAvgDistance').textContent = lineInfo.avg_distance || '-';
         document.getElementById('sumMaxSpeed').textContent = lineInfo.max_speed || '-';
         document.getElementById('sumOpeningDate').textContent = lineInfo.opening_date || '-';
+
+        // 全通年月日が存在する場合のみ、概要グリッドに項目を動的追加
+        if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
+          const summaryGrid = document.getElementById('summaryGrid');
+          const fullOpeningItem = document.createElement('div');
+          fullOpeningItem.className = 'summary-item';
+          fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${lineInfo.full_opening_date}</span>`;
+          summaryGrid.appendChild(fullOpeningItem);
+        }
       }
     })
     .catch(err => console.error('路線概要データ取得エラー:', err));
