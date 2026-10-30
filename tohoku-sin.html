@@ -257,7 +257,7 @@
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
-      const lineInfo = data.find(r => r.html_file === 'yamanote.html' || r.numbering === 'JY');
+      const lineInfo = data.find(r => r.html_file === 'tohoku-sin.html' || r.numbering === '-');
       if (lineInfo) {
         document.getElementById('sumDistance').textContent = lineInfo.distance || '-';
         document.getElementById('sumStations').textContent = lineInfo.station_count || '-';
