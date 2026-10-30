@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR東日本｜路線一覧</title>
+  <title>JR東日本 路線一覧データベース</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -16,23 +16,24 @@
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: #f4f6f8; line-height: 1.5; padding: 30px 15px; }
-    .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: #f4f6f8; line-height: 1.5; padding: 20px 10px; }
+    .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 24px 16px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
     
     header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 20px; }
-    h1 { font-size: 1.8rem; color: var(--primary-color); font-weight: 700; }
-    p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; }
+    h1 { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+    p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
 
-    .search-section { margin-bottom: 25px; }
-    .search-input { width: 100%; padding: 12px 16px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-section { margin-bottom: 20px; }
+    .search-input { width: 100%; padding: 12px 16px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: #fff; }
     .search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,128,0,0.1); }
 
     .loading { text-align: center; padding: 50px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
     .no-result { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; }
 
-    .section-title { font-size: 1.2rem; font-weight: 700; margin: 30px 0 15px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
+    .section-title { font-size: 1.15rem; font-weight: 700; margin: 25px 0 12px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
 
-    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 18px; }
+    /* 路線カードグリッド（スマホで1列に強制固定してズレを防ぐ） */
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; width: 100%; }
     
     .route-card {
       display: flex;
@@ -41,11 +42,12 @@
       background: #fff;
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 18px;
+      padding: 16px;
       text-decoration: none;
       color: var(--text-color);
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
+      width: 100%;
     }
     .route-card:hover {
       transform: translateY(-2px);
@@ -55,11 +57,11 @@
     }
 
     .route-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .route-info { display: flex; align-items: center; gap: 12px; }
-    .route-symbol { height: 38px; width: auto; object-fit: contain; }
-    .route-name { font-size: 1.15rem; font-weight: 700; }
-    .route-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; }
+    .route-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .route-symbol { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .route-name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .route-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; flex-shrink: 0; }
 
     .specs-grid {
       display: grid;
@@ -75,21 +77,28 @@
     .spec-item { display: flex; flex-direction: column; }
     .spec-label { color: var(--text-muted); font-size: 0.7rem; font-weight: 600; }
     .spec-val { font-weight: 700; color: var(--text-color); }
+
+    /* スマホ表示のときの最適化 */
+    @media (max-width: 768px) {
+      body { padding: 10px 5px; }
+      .container { padding: 16px 12px; }
+      .route-grid { grid-template-columns: 1fr; } /* スマホでは完全に1列にして右ズレを防止 */
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
   <header>
-    <h1>JR東日本 路線一覧</h1>
-    <p class="subtitle">ご覧になりたい路線を選択すると、その路線の駅一覧や駅の詳細を見ることができます。</p>
+    <h1>JR東日本 路線一覧データベース</h1>
+    <p class="subtitle">ご覧になりたい路線を選択してください。</p>
   </header>
 
   <div class="search-section">
     <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・カテゴリ等で検索..." oninput="filterRoutes()">
   </div>
 
-  <div id="loading" class="loading">読み込み中...</div>
+  <div id="loading" class="loading">路線一覧データを読み込み中...</div>
   <div id="routeContainer"></div>
 </div>
 
@@ -97,6 +106,19 @@
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
 
   let allRoutes = [];
+
+  // 日付フォーマット関数（ISO8601対策）
+  function formatDate(isoString) {
+    if (!isoString) return '-';
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+    return date.toLocaleDateString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
 
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
@@ -147,10 +169,9 @@
         const hasImg = r.numbering && r.numbering.trim() !== '-' && r.numbering.trim() !== '';
         const imgTag = hasImg ? `<img src="${r.numbering.trim()}.png" alt="${r.numbering}" class="route-symbol" onerror="this.style.display='none'">` : '';
 
-        // 全通日が存在する場合のみHTMLを生成
         const hasFullOpening = r.full_opening_date && r.full_opening_date.trim() !== '' && r.full_opening_date.trim() !== '-';
         const fullOpeningHTML = hasFullOpening ? `
-          <div class="spec-item"><span class="spec-label">全通年月日</span><span class="spec-val">${r.full_opening_date}</span></div>
+          <div class="spec-item"><span class="spec-label">全通年月日</span><span class="spec-val">${formatDate(r.full_opening_date)}</span></div>
         ` : '';
 
         return `
@@ -172,7 +193,7 @@
                 <div class="spec-item"><span class="spec-label">駅数</span><span class="spec-val">${r.station_count || '-'}</span></div>
                 <div class="spec-item"><span class="spec-label">平均駅間距離</span><span class="spec-val">${r.avg_distance || '-'}</span></div>
                 <div class="spec-item"><span class="spec-label">最高速度</span><span class="spec-val">${r.max_speed || '-'}</span></div>
-                <div class="spec-item"><span class="spec-label">開業年月日</span><span class="spec-val">${r.opening_date || '-'}</span></div>
+                <div class="spec-item"><span class="spec-label">開業年月日</span><span class="spec-val">${formatDate(r.opening_date)}</span></div>
                 ${fullOpeningHTML}
               </div>
             </div>
