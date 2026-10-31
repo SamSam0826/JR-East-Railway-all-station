@@ -138,39 +138,36 @@
     .link-btn { color: #0969da; text-decoration: none; font-weight: 600; }
     .link-btn:hover { text-decoration: underline; }
 
-    /* カード表示（レイアウト破綻を完全に防ぐ堅牢な構造） */
+    /* カード表示デザイン調整 */
     .card-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
     .station-card { border: 1px solid var(--border-color); border-left: 6px solid var(--primary-color); padding: 16px; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; }
     .station-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-    
-    /* 左側グループ（画像 ＋ 駅名・かな） */
-    .card-left-group { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-    .card-numbering-img { height: 44px; width: auto; object-fit: contain; flex-shrink: 0; } /* 大きすぎず小さすぎない丁度いいサイズに調整 */
+    /* ヘッダー：左側に画像と駅名をゆったり配置 */
+    .card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+    .card-numbering-img { height: 50px; width: auto; object-fit: contain; flex-shrink: 0; }
     
     .card-title-area { flex: 1; min-width: 0; }
-    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-color); line-height: 1.3; word-break: normal; overflow-wrap: break-word; }
-    .card-kana { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; white-space: normal; }
+    .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); line-height: 1.3; overflow-wrap: break-word; }
+    .card-kana { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
     
-    /* 右側エリア（テキストのナンバリングバッジ） */
-    .card-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; max-width: 40%; }
-    .card-numbering-badge { 
-      font-size: 0.78rem; 
-      font-weight: 600; 
-      color: var(--primary-dark); 
+    .card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+    
+    /* ナンバリングテキスト専用の横長エリア（カード幅いっぱいに表示） */
+    .card-numbering-box { 
       background: var(--primary-light); 
-      padding: 3px 6px; 
-      border-radius: 6px; 
       border: 1px solid rgba(0,128,0,0.2); 
-      text-align: right; 
-      line-height: 1.4;
-      white-space: pre-line;
-      word-break: break-all;
+      border-radius: 6px; 
+      padding: 6px 10px; 
+      margin-bottom: 12px; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      font-size: 0.82rem;
     }
+    .card-numbering-label { font-weight: 700; color: var(--primary-dark); white-space: nowrap; font-size: 0.75rem; }
+    .card-numbering-text { font-weight: 600; color: var(--text-color); word-break: break-all; }
 
-    .card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; border-bottom: 1px solid #f0f3f6; padding-bottom: 8px; }
-    
     .card-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 0.82rem; margin-bottom: 12px; background: #fafbfc; padding: 10px; border-radius: 6px; border: 1px solid #f0f3f6; }
     .card-info-item { display: flex; flex-direction: column; }
     .card-info-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
@@ -473,10 +470,8 @@
       { label: "点字運賃表", val: s.braille }
     ];
 
-    // スプレッドシートの「numbering_image」列の値（例：「JY-01」など）を取得
+    // スプレッドシートの「numbering_image」列の値を取得
     const rawNumImg = s.numbering_image ? s.numbering_image.trim() : '';
-    
-    // ハイフン自動補正 ＋ 駅名と組み合わせて「JY-01-東京.png」のようなファイル名を自動生成
     const formattedNumImg = rawNumImg.replace(/^([A-Za-z]+)(\d+)/, '$1-$2');
     const imgFileName = formattedNumImg && s.name ? `${formattedNumImg}-${s.name}.png` : '';
     const numImgTag = imgFileName ? `<img src="${imgFileName}" alt="" class="card-numbering-img" onerror="this.style.display='none'">` : '';
@@ -484,21 +479,22 @@
     return `
       <div class="station-card">
         <div class="card-header">
-          <!-- 左側グループ：画像 ＋ 駅名・かな（幅をしっかり確保して文字潰れを防止） -->
-          <div class="card-left-group">
-            ${numImgTag}
-            <div class="card-title-area">
-              <div class="card-title">${s.name || '-'}</div>
-              ${s.kana ? `<div class="card-kana">(${s.kana})</div>` : ''}
-            </div>
-          </div>
-          <!-- 右側エリア：テキストのナンバリングバッジ -->
-          <div class="card-right-area">
-            ${s.numbering ? `<div class="card-numbering-badge">${s.numbering}</div>` : ''}
+          ${numImgTag}
+          <div class="card-title-area">
+            <div class="card-title">${s.name || '-'}</div>
+            ${s.kana ? `<div class="card-kana">(${s.kana})</div>` : ''}
           </div>
         </div>
         <div class="card-sub">${s.address || '所在地未登録'} ${s.branch ? `| [${s.branch}]` : ''}</div>
         
+        <!-- ナンバリングテキスト専用の横長エリア -->
+        ${s.numbering ? `
+          <div class="card-numbering-box">
+            <span class="card-numbering-label">ナンバリング:</span>
+            <span class="card-numbering-text">${s.numbering}</span>
+          </div>
+        ` : ''}
+
         <div class="card-info-grid">
           <div class="card-info-item"><span class="card-info-label">営業キロ</span><span class="card-info-value">${s.distance || '-'}</span></div>
           <div class="card-info-item"><span class="card-info-label">次駅距離</span><span class="card-info-value">${s.next_distance || '-'}</span></div>
