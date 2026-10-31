@@ -152,20 +152,33 @@
     
     .card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
     
-    /* ナンバリングテキストエリア（PCでは横並び） */
+    /* ナンバリングチップを並べるコンテナ（スマートなフレキシブル配置） */
     .card-numbering-box { 
       background: var(--primary-light); 
       border: 1px solid rgba(0,128,0,0.2); 
       border-radius: 6px; 
-      padding: 6px 10px; 
+      padding: 8px 10px; 
       margin-bottom: 12px; 
       display: flex; 
       align-items: center; 
-      gap: 8px; 
+      gap: 6px; 
+      flex-wrap: wrap; /* チップが増えたら自動で綺麗に折り返す */
       font-size: 0.82rem;
     }
-    .card-numbering-label { font-weight: 700; color: var(--primary-dark); white-space: nowrap; font-size: 0.75rem; }
-    .card-numbering-text { font-weight: 600; color: var(--text-color); word-break: break-all; }
+    .card-numbering-label { font-weight: 700; color: var(--primary-dark); white-space: nowrap; font-size: 0.75rem; margin-right: 2px; }
+    
+    /* 1つずつの独立したナンバリングチップ */
+    .numbering-chip {
+      background: #fff;
+      border: 1px solid rgba(0,128,0,0.3);
+      color: var(--primary-dark);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
 
     .card-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 0.82rem; margin-bottom: 12px; background: #fafbfc; padding: 10px; border-radius: 6px; border: 1px solid #f0f3f6; }
     .card-info-item { display: flex; flex-direction: column; }
@@ -190,18 +203,10 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* スマホ表示のときの特別調整 */
     @media (max-width: 768px) {
       .view-mode-toggle { display: none !important; }
       .table-container { display: none !important; }
       .card-grid-container { display: flex !important; flex-direction: column; }
-      
-      /* スマホではナンバリング欄を「上下の縦並び」にしてスペースを最大化する */
-      .card-numbering-box {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-      }
     }
   </style>
 </head>
@@ -482,6 +487,15 @@
     const imgFileName = formattedNumImg && s.name ? `${formattedNumImg}-${s.name}.png` : '';
     const numImgTag = imgFileName ? `<img src="${imgFileName}" alt="" class="card-numbering-img" onerror="this.style.display='none'">` : '';
 
+    // ナンバリングをカンマや読点で1つずつ分割して、個別の小さなバッジ（チップ）に変換する
+    let numberingChipsHTML = '-';
+    if (s.numbering && s.numbering.trim() !== '' && s.numbering.trim() !== '-') {
+      const chips = s.numbering.split(/[,、]/).map(n => n.trim()).filter(Boolean);
+      if (chips.length > 0) {
+        numberingChipsHTML = chips.map(c => `<span class="numbering-chip">${c}</span>`).join('');
+      }
+    }
+
     return `
       <div class="station-card">
         <div class="card-header">
@@ -493,12 +507,11 @@
         </div>
         <div class="card-sub">${s.address || '所在地未登録'} ${s.branch ? `| [${s.branch}]` : ''}</div>
         
-        ${s.numbering ? `
-          <div class="card-numbering-box">
-            <span class="card-numbering-label">ナンバリング:</span>
-            <span class="card-numbering-text">${s.numbering}</span>
-          </div>
-        ` : ''}
+        <!-- ナンバリングチップ専用エリア（少ない駅は1行でスッキリ、東京駅などはバッジ単位で綺麗に折り返し） -->
+        <div class="card-numbering-box">
+          <span class="card-numbering-label">ナンバリング:</span>
+          ${numberingChipsHTML}
+        </div>
 
         <div class="card-info-grid">
           <div class="card-info-item"><span class="card-info-label">営業キロ</span><span class="card-info-value">${s.distance || '-'}</span></div>
