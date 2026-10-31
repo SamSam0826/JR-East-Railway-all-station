@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR駅詳細データベース - ぜんぶ盛り完全版</title>
+  <title>JR駅詳細データベース</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -195,6 +195,9 @@
 
     .compare-check-label { font-size: 0.75rem; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-muted); font-weight: 600; }
 
+    /* 表表示のときは比較チェックボックスを隠す */
+    body.table-mode .compare-check-label { display: none !important; }
+
     .card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
     
     .card-numbering-box { 
@@ -247,7 +250,7 @@
 
     .card-links { display: flex; gap: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border-color); padding-top: 10px; }
 
-    /* 比較フロートバー（初期非表示を厳格化） */
+    /* 比較フロートバー */
     .compare-float-bar {
       position: fixed;
       bottom: 20px;
@@ -289,6 +292,16 @@
     .compare-table th, .compare-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: center; }
     .compare-table th { background: var(--bg-header); color: var(--text-color); }
 
+    /* 比較表の中のナンバリングチップボックス（スマホなどで3つで折り返し） */
+    .compare-chips-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+      max-width: 135px;
+      margin: 0 auto;
+    }
+
     @media (max-width: 768px) {
       .view-mode-toggle { display: none !important; }
       .table-container { display: none !important; }
@@ -326,7 +339,8 @@
       <div class="summary-item"><span class="summary-label">平均駅間距離</span><span class="summary-val" id="sumAvgDistance">-</span></div>
       <div class="summary-item"><span class="summary-label">最高速度</span><span class="summary-val" id="sumMaxSpeed">-</span></div>
       <div class="summary-item"><span class="summary-label">開業年月日</span><span class="summary-val" id="sumOpeningDate">-</span></div>
-      <div class="summary-item"><span class="summary-label">スタンプ制覇</span><span class="summary-val" id="sumStampProgress">0 / 0 駅 (0%)</span></div>
+      <!-- 「駅訪問制覇」は常に一番右側（最後）に配置 -->
+      <div class="summary-item"><span class="summary-label">駅訪問制覇</span><span class="summary-val" id="sumStampProgress">0 / 0 駅 (0%)</span></div>
     </div>
   </details>
 
@@ -400,7 +414,7 @@
   <button class="utility-btn" onclick="clearComparison()" style="padding: 4px 8px; font-size: 0.75rem;">解除</button>
 </div>
 
-<!-- モーダル（比較用） -->
+<!-- モーダル -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeModalDirect()">&times;</button>
@@ -417,13 +431,16 @@
 
   let allStations = [];
   let currentBranch = '';
-  let currentViewMode = 'table'; // 初期表示を表表示に修正
+  let currentViewMode = 'table'; // 初期表示は表表示
 
   let favorites = JSON.parse(localStorage.getItem('jr_fav_' + currentLine) || '[]');
   let visitedStamps = JSON.parse(localStorage.getItem('jr_stamp_' + currentLine) || '[]');
   let compareList = [];
   let isFavFilterActive = false;
   let isStampFilterActive = false;
+
+  // 初期化時に table-mode クラスを付与
+  document.body.classList.add('table-mode');
 
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
@@ -464,13 +481,13 @@
         document.getElementById('sumMaxSpeed').textContent = lineInfo.max_speed || '-';
         document.getElementById('sumOpeningDate').textContent = formatDate(lineInfo.opening_date);
 
-        // 「全通」の表示を復活
         if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
           const summaryGrid = document.getElementById('summaryGrid');
           const fullOpeningItem = document.createElement('div');
           fullOpeningItem.className = 'summary-item';
           fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${formatDate(lineInfo.full_opening_date)}</span>`;
-          summaryGrid.appendChild(fullOpeningItem);
+          // 「駅訪問制覇」の直前に挿入することで、「駅訪問制覇」が常に一番右側になるようにする
+          summaryGrid.insertBefore(fullOpeningItem, summaryGrid.lastElementChild);
         }
       }
     })
@@ -585,7 +602,8 @@
     const bar = document.getElementById('compareFloatBar');
     const text = document.getElementById('compareCountText');
     text.textContent = `${compareList.length}件選択中`;
-    if (compareList.length > 0) {
+    // 表表示（table）のときは、たとえ選択されていてもバーを出さない
+    if (compareList.length > 0 && currentViewMode === 'card') {
       bar.classList.add('active');
     } else {
       bar.classList.remove('active');
@@ -616,7 +634,12 @@
           </tr>
           <tr>
             <td>ナンバリング</td>
-            ${selectedStations.map(s => `<td>${s.numbering || '-'}</td>`).join('')}
+            ${selectedStations.map(s => {
+              if (!s.numbering || s.numbering.trim() === '' || s.numbering.trim() === '-') return '<td>-</td>';
+              const chips = s.numbering.split(/[,、]/).map(n => n.trim()).filter(Boolean);
+              const chipsHTML = chips.map(c => `<span class="numbering-chip">${c}</span>`).join('');
+              return `<td><div class="compare-chips-box">${chipsHTML}</div></td>`;
+            }).join('')}
           </tr>
           <tr>
             <td>営業キロ</td>
@@ -660,7 +683,16 @@
     currentViewMode = mode;
     document.getElementById('btnTableView').classList.toggle('active', mode === 'table');
     document.getElementById('btnCardView').classList.toggle('active', mode === 'card');
+    
+    // 表表示モードのときは body に table-mode クラスを付与して比較ボタン等を隠す
+    if (mode === 'table') {
+      document.body.classList.add('table-mode');
+    } else {
+      document.body.classList.remove('table-mode');
+    }
+
     updateViewVisibility();
+    updateCompareBar();
   }
 
   function updateViewVisibility() {
