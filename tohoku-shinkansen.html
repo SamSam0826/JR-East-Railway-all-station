@@ -152,7 +152,7 @@
     
     .card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
     
-    /* ナンバリングチップを並べるコンテナ（スマートなフレキシブル配置） */
+    /* ナンバリングチップコンテナ（デフォルトはPC向け：6つ未満なら横並び） */
     .card-numbering-box { 
       background: var(--primary-light); 
       border: 1px solid rgba(0,128,0,0.2); 
@@ -162,12 +162,11 @@
       display: flex; 
       align-items: center; 
       gap: 6px; 
-      flex-wrap: wrap; /* チップが増えたら自動で綺麗に折り返す */
+      flex-wrap: wrap; 
       font-size: 0.82rem;
     }
     .card-numbering-label { font-weight: 700; color: var(--primary-dark); white-space: nowrap; font-size: 0.75rem; margin-right: 2px; }
     
-    /* 1つずつの独立したナンバリングチップ */
     .numbering-chip {
       background: #fff;
       border: 1px solid rgba(0,128,0,0.3);
@@ -178,6 +177,13 @@
       border-radius: 4px;
       white-space: nowrap;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* パソコン表示で6つ以上の場合：縦並びにするクラス */
+    .card-numbering-box.pc-vertical {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
     }
 
     .card-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 0.82rem; margin-bottom: 12px; background: #fafbfc; padding: 10px; border-radius: 6px; border: 1px solid #f0f3f6; }
@@ -203,10 +209,18 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    /* スマホ表示のときのレスポンシブ設定 */
     @media (max-width: 768px) {
       .view-mode-toggle { display: none !important; }
       .table-container { display: none !important; }
       .card-grid-container { display: flex !important; flex-direction: column; }
+      
+      /* スマホ表示で4つ以上の場合：縦並びにするクラス */
+      .card-numbering-box.mobile-vertical {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
     }
   </style>
 </head>
@@ -487,14 +501,22 @@
     const imgFileName = formattedNumImg && s.name ? `${formattedNumImg}-${s.name}.png` : '';
     const numImgTag = imgFileName ? `<img src="${imgFileName}" alt="" class="card-numbering-img" onerror="this.style.display='none'">` : '';
 
-    // ナンバリングをカンマや読点で1つずつ分割して、個別の小さなバッジ（チップ）に変換する
+    // ナンバリングをチップに分解してカウント
     let numberingChipsHTML = '-';
+    let chipCount = 0;
     if (s.numbering && s.numbering.trim() !== '' && s.numbering.trim() !== '-') {
       const chips = s.numbering.split(/[,、]/).map(n => n.trim()).filter(Boolean);
-      if (chips.length > 0) {
+      chipCount = chips.length;
+      if (chipCount > 0) {
         numberingChipsHTML = chips.map(c => `<span class="numbering-chip">${c}</span>`).join('');
       }
     }
+
+    // パソコンで6つ以上、スマホで4つ以上の場合に付与するクラスを自動判定
+    // （CSS側でそれぞれ pc-vertical / mobile-vertical クラスとして制御します）
+    let boxClasses = "card-numbering-box";
+    if (chipCount >= 6) boxClasses += " pc-vertical";
+    if (chipCount >= 4) boxClasses += " mobile-vertical";
 
     return `
       <div class="station-card">
@@ -507,8 +529,8 @@
         </div>
         <div class="card-sub">${s.address || '所在地未登録'} ${s.branch ? `| [${s.branch}]` : ''}</div>
         
-        <!-- ナンバリングチップ専用エリア（少ない駅は1行でスッキリ、東京駅などはバッジ単位で綺麗に折り返し） -->
-        <div class="card-numbering-box">
+        <!-- ナンバリングチップ専用エリア（個数に応じて縦並びが自動切り替わり） -->
+        <div class="${boxClasses}">
           <span class="card-numbering-label">ナンバリング:</span>
           ${numberingChipsHTML}
         </div>
