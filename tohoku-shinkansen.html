@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR駅詳細データベース - ぜんぶ盛り</title>
+  <title>JR駅詳細データベース - ぜんぶ盛り完全版</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -19,7 +19,6 @@
       --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
     }
 
-    /* ダークモード時のカラー変数 */
     body.dark-mode {
       --primary-color: #00aa00;
       --primary-dark: #4caf50;
@@ -171,7 +170,6 @@
     .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); line-height: 1.3; overflow-wrap: break-word; }
     .card-kana { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
     
-    /* カード右上アクション（お気に入り・スタンプ・比較チェック） */
     .card-top-actions { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
     .action-group { display: flex; gap: 6px; align-items: center; }
     
@@ -199,7 +197,6 @@
 
     .card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
     
-    /* ナンバリングボックス */
     .card-numbering-box { 
       background: var(--bg-header); 
       border: 1px solid var(--border-color); 
@@ -250,12 +247,14 @@
 
     .card-links { display: flex; gap: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border-color); padding-top: 10px; }
 
-    /* 比較フロートバー */
+    /* 比較フロートバー（初期非表示を厳格化） */
     .compare-float-bar {
       position: fixed;
       bottom: 20px;
       left: 50%;
-      transform: translateX(-50%) translateY(100px);
+      transform: translateX(-50%) translateY(120px);
+      opacity: 0;
+      pointer-events: none;
       background: var(--bg-card);
       border: 2px solid var(--primary-color);
       box-shadow: var(--shadow-md);
@@ -265,9 +264,13 @@
       align-items: center;
       gap: 16px;
       z-index: 999;
-      transition: transform 0.3s ease;
+      transition: all 0.3s ease;
     }
-    .compare-float-bar.active { transform: translateX(-50%) translateY(0); }
+    .compare-float-bar.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
     .compare-execute-btn { background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
     .compare-execute-btn:hover { background: var(--primary-dark); }
 
@@ -282,7 +285,6 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* 比較モーダルのテーブル */
     .compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
     .compare-table th, .compare-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: center; }
     .compare-table th { background: var(--bg-header); color: var(--text-color); }
@@ -358,7 +360,7 @@
 
   <div id="loadingView" class="loading">Googleスプレッドシートから最新データを読み込み中...</div>
 
-  <div class="table-container" id="tableView" style="display: none;">
+  <div class="table-container" id="tableView">
     <table>
       <thead>
         <tr>
@@ -398,7 +400,7 @@
   <button class="utility-btn" onclick="clearComparison()" style="padding: 4px 8px; font-size: 0.75rem;">解除</button>
 </div>
 
-<!-- モーダル（詳細 / 比較） -->
+<!-- モーダル（比較用） -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeModalDirect()">&times;</button>
@@ -415,16 +417,14 @@
 
   let allStations = [];
   let currentBranch = '';
-  let currentViewMode = 'card'; // デフォルトカード表示見栄え良いので
+  let currentViewMode = 'table'; // 初期表示を表表示に修正
 
-  // ユーザーデータ（LocalStorage管理）
   let favorites = JSON.parse(localStorage.getItem('jr_fav_' + currentLine) || '[]');
   let visitedStamps = JSON.parse(localStorage.getItem('jr_stamp_' + currentLine) || '[]');
   let compareList = [];
   let isFavFilterActive = false;
   let isStampFilterActive = false;
 
-  // ダークモード初期化
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
     document.getElementById('darkModeBtn').textContent = '☀️ ライトモード';
@@ -463,6 +463,15 @@
         document.getElementById('sumAvgDistance').textContent = lineInfo.avg_distance || '-';
         document.getElementById('sumMaxSpeed').textContent = lineInfo.max_speed || '-';
         document.getElementById('sumOpeningDate').textContent = formatDate(lineInfo.opening_date);
+
+        // 「全通」の表示を復活
+        if (lineInfo.full_opening_date && lineInfo.full_opening_date.trim() !== '' && lineInfo.full_opening_date.trim() !== '-') {
+          const summaryGrid = document.getElementById('summaryGrid');
+          const fullOpeningItem = document.createElement('div');
+          fullOpeningItem.className = 'summary-item';
+          fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${formatDate(lineInfo.full_opening_date)}</span>`;
+          summaryGrid.appendChild(fullOpeningItem);
+        }
       }
     })
     .catch(err => console.error('路線概要データ取得エラー:', err));
@@ -618,6 +627,13 @@
             ${selectedStations.map(s => `<td>${s.platform || '-'}</td>`).join('')}
           </tr>
           <tr>
+            <td>乗り入れ路線数</td>
+            ${selectedStations.map(s => {
+              const count = s.transfer ? s.transfer.split(/[,、]/).length : 0;
+              return `<td>${count > 0 ? count + '路線' : 'なし'}</td>`;
+            }).join('')}
+          </tr>
+          <tr>
             <td>Suica</td>
             ${selectedStations.map(s => `<td>${fmt(s.suica)}</td>`).join('')}
           </tr>
@@ -632,10 +648,6 @@
           <tr>
             <td>エレベーター</td>
             ${selectedStations.map(s => `<td>${fmt(s.elevator)}</td>`).join('')}
-          </tr>
-          <tr>
-            <td>乗り換え</td>
-            ${selectedStations.map(s => `<td style="font-size:0.75rem;">${s.transfer || 'なし'}</td>`).join('')}
           </tr>
         </table>
       </div>
@@ -758,7 +770,7 @@
     const isCompared = compareList.includes(s.name);
 
     return `
-      <div class="station-card" onclick="openModalByIndex('${s.name}')">
+      <div class="station-card">
         <div class="card-top-actions">
           <div class="action-group">
             <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${s.name}', event)">
@@ -801,9 +813,9 @@
         </div>
 
         <div class="card-links">
-          ${s.official_url ? `<a href="${s.official_url}" target="_blank" class="link-btn" onclick="event.stopPropagation()">公式HP ↗</a>` : ''}
-          ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn" onclick="event.stopPropagation()">Googleマップ ↗</a>` : ''}
-          ${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn" onclick="event.stopPropagation()">Wikipedia ↗</a>` : ''}
+          ${s.official_url ? `<a href="${s.official_url}" target="_blank" class="link-btn">公式HP ↗</a>` : ''}
+          ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">Googleマップ ↗</a>` : ''}
+          ${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">Wikipedia ↗</a>` : ''}
         </div>
       </div>
     `;
@@ -813,7 +825,6 @@
     const s = allStations.find(item => item.name === stationName);
     if (!s) return;
     
-    // モーダルでは通常のカード詳細を表示しつつ、操作ボタンも利くようにする
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = buildCardHTML(s);
     document.getElementById('modalBody').innerHTML = '';
