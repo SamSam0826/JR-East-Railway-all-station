@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JR東日本 路線一覧</title>
+  <title>路線一覧｜JR東日本駅一覧</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -136,16 +136,16 @@
       <p class="subtitle"></p>
     </div>
     <div class="header-btns">
-      <a href="report.html" class="utility-btn">📢 不具合報告</a>
-      <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダークモード</button>
+      <a href="report.html" class="utility-btn">報告する</a>
+      <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダーク</button>
     </div>
   </header>
 
   <div class="search-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・カテゴリ等で検索..." oninput="filterRoutes()">
+    <input type="text" id="searchInput" class="search-input" placeholder="検索します（路線名・区間・カテゴリなど）" oninput="filterRoutes()">
   </div>
 
-  <div id="loading" class="loading">路線一覧データを読み込み中...</div>
+  <div id="loading" class="loading">読み込み中...</div>
   <div id="routeContainer"></div>
 </div>
 
@@ -157,14 +157,14 @@
   // ダークモード初期化
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
-    document.getElementById('darkModeBtn').textContent = '☀️ ライトモード';
+    document.getElementById('darkModeBtn').textContent = '☀️ ライト';
   }
 
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     localStorage.setItem('jr_dark_mode', isDark);
-    document.getElementById('darkModeBtn').textContent = isDark ? '☀️ ライトモード' : '🌙 ダークモード';
+    document.getElementById('darkModeBtn').textContent = isDark ? '☀️ ライト' : '🌙 ダーク';
   }
 
   function formatDate(isoString) {
