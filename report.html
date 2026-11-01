@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>不具合・データ修正報告</title>
+  <title>不具合・データ修正報告｜JR東日本駅一覧</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -115,7 +115,7 @@
 
       if (res.ok || res.status === 204) {
         msg.style.color = '#2e7d32';
-        msg.textContent = '✅ 送信が完了しました！ご協力ありがとうございます。';
+        msg.textContent = '✅ 送信が完了しました！ありがとうございます！';
         document.getElementById('reportForm').reset();
       } else {
         throw new Error('送信に失敗しました');
