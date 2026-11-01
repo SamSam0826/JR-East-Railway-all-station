@@ -178,9 +178,8 @@
     .icon-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; border: 1px solid transparent; font-weight: 600; }
     .icon-badge.on { background: #dafbe1; color: #116329; border-color: #4ac26b; }
     .icon-badge.off { background: var(--bg-header); color: var(--text-muted); border-color: var(--border-color); text-decoration: line-through; opacity: 0.7; }
-    .card-links { display: flex; gap: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border-color); pt: 10px; padding-top: 10px; }
+    .card-links { display: flex; gap: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border-color); padding-top: 10px; }
 
-    /* 比較フロートバー（1件以下のときはボタンを無効化） */
     .compare-float-bar {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120px);
       opacity: 0; pointer-events: none; background: var(--bg-card); border: 2px solid var(--primary-color);
@@ -194,7 +193,10 @@
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: var(--bg-card); border-radius: 12px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
-    .modal-close { position: absolute; top: 16px; right: 18px; font-size: 1.4rem; font-weight: bold; border: none; background: none; cursor: pointer; color: var(--text-muted); }
+    
+    /* 閉じるボタンを常に最前面に表示するように修正 */
+    .modal-close { position: absolute; top: 16px; right: 18px; font-size: 1.4rem; font-weight: bold; border: none; background: none; cursor: pointer; color: var(--text-muted); z-index: 10; }
+    
     .compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
     .compare-table th, .compare-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: center; }
     .compare-table th { background: var(--bg-header); }
@@ -324,7 +326,6 @@
 
 <div class="compare-float-bar" id="compareFloatBar">
   <span id="compareCountText" style="font-size: 0.9rem; font-weight: bold;">0件選択中</span>
-  <!-- 1件以下のときはボタンを押せない（disabled） -->
   <button class="compare-execute-btn" id="compareExecBtn" onclick="openCompareModal()" disabled>📊 比較する</button>
   <button class="utility-btn" onclick="clearComparison()" style="padding: 4px 8px; font-size: 0.75rem;">解除</button>
 </div>
@@ -510,7 +511,6 @@
     
     text.textContent = `${compareList.length}件選択中`;
     
-    // 2件以上選択されているときのみ「比較する」ボタンを有効化
     if (compareList.length >= 2) {
       execBtn.disabled = false;
     } else {
