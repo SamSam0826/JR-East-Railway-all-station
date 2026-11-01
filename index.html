@@ -15,9 +15,13 @@
       --text-muted: #656d76;
       --bg-card: #fff;
       --bg-body: #f4f6f8;
+      --spec-bg: #f8f9fa;
+      --spec-border: #ebedf0;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
     }
+
+    /* ダークモード時のカラー変数 */
     body.dark-mode {
       --primary-color: #00aa00;
       --primary-dark: #4caf50;
@@ -28,44 +32,134 @@
       --text-muted: #8b949e;
       --bg-card: #0d1117;
       --bg-body: #010409;
+      --spec-bg: #161b22;
+      --spec-border: #30363d;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: var(--bg-body); line-height: 1.5; padding: 20px 15px; transition: background 0.3s, color 0.3s; }
-    .container { max-width: 1200px; margin: 0 auto; background: var(--bg-card); padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
-    header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-color); }
-    .header-btns { display: flex; gap: 8px; }
-    .utility-btn { text-decoration: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 6px 12px; background: var(--bg-header); border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text-color); background-color: var(--bg-body); line-height: 1.5; padding: 20px 10px; transition: background 0.3s, color 0.3s; }
+    .container { max-width: 1200px; margin: 0 auto; background: var(--bg-card); padding: 24px 16px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); transition: background 0.3s, border 0.3s; }
+
+    header { border-bottom: 3px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+    h1 { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+    p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+    .header-btns { display: flex; gap: 8px; align-items: center; }
+    .utility-btn { text-decoration: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 6px 12px; background: var(--bg-header); border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; }
     .utility-btn:hover { background: var(--primary-light); color: var(--primary-dark); }
 
-    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .route-card { border: 1px solid var(--border-color); border-left: 6px solid var(--primary-color); padding: 16px; background: var(--bg-card); border-radius: 8px; box-shadow: var(--shadow-sm); text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px; transition: 0.2s; }
-    .route-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .route-card.prep { opacity: 0.6; pointer-events: none; border-left-color: var(--text-muted); }
-    .route-name { font-size: 1.1rem; font-weight: bold; }
-    .prep-badge { color: #d32f2f; font-weight: bold; font-size: 0.85rem; }
+    .search-section { margin-bottom: 20px; }
+    .search-input { width: 100%; padding: 12px 16px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: var(--bg-card); color: var(--text-color); }
+    .search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,128,0,0.1); }
+
+    .loading { text-align: center; padding: 50px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
+    .no-result { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; }
+
+    .section-title { font-size: 1.15rem; font-weight: 700; margin: 25px 0 12px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
+
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; width: 100%; }
+
+    .route-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      text-decoration: none;
+      color: var(--text-color);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+    .route-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-color);
+    }
+    .route-card.prep {
+      opacity: 0.55;
+      pointer-events: none;
+      border-left: 6px solid var(--text-muted);
+    }
+
+    .route-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .route-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .route-symbol { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .route-name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .route-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; flex-shrink: 0; }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 10px;
+      font-size: 0.78rem;
+      background: var(--spec-bg);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--spec-border);
+      margin-top: 8px;
+    }
+    .spec-item { display: flex; flex-direction: column; }
+    .spec-label { color: var(--text-muted); font-size: 0.7rem; font-weight: 600; }
+    .spec-val { font-weight: 700; color: var(--text-color); }
+
+    .prep-message {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #d32f2f;
+      background: var(--spec-bg);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--spec-border);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 10px 5px; }
+      .container { padding: 16px 12px; }
+      .route-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
   <header>
-    <h1>JR東日本 路線一覧</h1>
+    <div>
+      <h1>JR東日本 路線一覧</h1>
+      <p class="subtitle"></p>
+    </div>
     <div class="header-btns">
-      <a href="report.html" class="utility-btn">📢 不具合・データ修正報告</a>
+      <a href="report.html" class="utility-btn">📢 不具合報告</a>
       <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダークモード</button>
     </div>
   </header>
 
-  <div id="loading" style="text-align:center; padding:30px; font-weight:bold;">読み込み中...</div>
-  <div class="route-grid" id="routeGrid"></div>
+  <div class="search-section">
+    <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・カテゴリ等で検索..." oninput="filterRoutes()">
+  </div>
+
+  <div id="loading" class="loading">路線一覧データを読み込み中...</div>
+  <div id="routeContainer"></div>
 </div>
 
 <script>
+  const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
+
+  let allRoutes = [];
+
+  // ダークモード初期化
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
     document.getElementById('darkModeBtn').textContent = '☀️ ライトモード';
   }
+
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -73,28 +167,112 @@
     document.getElementById('darkModeBtn').textContent = isDark ? '☀️ ライトモード' : '🌙 ダークモード';
   }
 
-  const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
+  function formatDate(isoString) {
+    if (!isoString) return '-';
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+    return date.toLocaleDateString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
 
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
+      allRoutes = data;
       document.getElementById('loading').style.display = 'none';
-      const grid = document.getElementById('routeGrid');
-      
-      grid.innerHTML = data.map(r => {
+      renderRoutes(allRoutes);
+    })
+    .catch(err => {
+      console.error('エラー:', err);
+      document.getElementById('loading').innerHTML = '<span style="color:red;">データの読み込みに失敗しました。</span>';
+    });
+
+  function filterRoutes() {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allRoutes.filter(r => {
+      const text = `${r.line_name || ''} ${r.section_info || ''} ${r.category || ''} ${r.numbering || ''}`.toLowerCase();
+      return text.includes(keyword);
+    });
+    renderRoutes(filtered);
+  }
+
+  function renderRoutes(routes) {
+    const container = document.getElementById('routeContainer');
+    container.innerHTML = '';
+
+    if (routes.length === 0) {
+      container.innerHTML = '<div class="no-result">一致する路線が見つかりませんでした。</div>';
+      return;
+    }
+
+    const grouped = {};
+    routes.forEach(r => {
+      const cat = r.category || 'その他路線';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(r);
+    });
+
+    Object.keys(grouped).forEach(cat => {
+      const catTitle = document.createElement('div');
+      catTitle.className = 'section-title';
+      catTitle.textContent = cat;
+
+      const grid = document.createElement('div');
+      grid.className = 'route-grid';
+
+      grid.innerHTML = grouped[cat].map(r => {
+        const hasImg = r.numbering && r.numbering.trim() !== '-' && r.numbering.trim() !== '';
+        const imgTag = hasImg ? `<img src="${r.numbering.trim()}.png" alt="${r.numbering}" class="route-symbol" onerror="this.style.display='none'">` : '';
+
+        // 準備中（preparation）の判定
         const isPrep = r.preparation && r.preparation.trim() !== '' && r.preparation !== 'FALSE' && r.preparation !== false;
-        
+
+        const hasFullOpening = r.full_opening_date && r.full_opening_date.trim() !== '' && r.full_opening_date.trim() !== '-';
+        const fullOpeningHTML = hasFullOpening ? `
+          <div class="spec-item"><span class="spec-label">全通年月日</span><span class="spec-val">${formatDate(r.full_opening_date)}</span></div>
+        ` : '';
+
+        const cardContent = isPrep ? `
+          <div class="prep-message">⏳ 準備中です</div>
+        ` : `
+          <div class="specs-grid">
+            <div class="spec-item"><span class="spec-label">営業キロ</span><span class="spec-val">${r.distance || '-'}</span></div>
+            <div class="spec-item"><span class="spec-label">駅数</span><span class="spec-val">${r.station_count || '-'}</span></div>
+            <div class="spec-item"><span class="spec-label">平均駅間距離</span><span class="spec-val">${r.avg_distance || '-'}</span></div>
+            <div class="spec-item"><span class="spec-label">最高速度</span><span class="spec-val">${r.max_speed || '-'}</span></div>
+            <div class="spec-item"><span class="spec-label">開業年月日</span><span class="spec-val">${formatDate(r.opening_date)}</span></div>
+            ${fullOpeningHTML}
+          </div>
+        `;
+
         return `
-          <a href="${isPrep ? '#' : r.html_file}" class="route-card ${isPrep ? 'prep' : ''}">
-            <div class="route-name">${r.line_name || '路線名未設定'}</div>
-            ${isPrep ? '<div class="prep-badge">⏳ 準備中です</div>' : `<div style="font-size:0.85rem; color:var(--text-muted);">駅数: ${r.station_count || '-'}駅 / 営業キロ: ${r.distance || '-'}</div>`}
+          <a href="${isPrep ? '#' : (r.html_file || '#')}" class="route-card ${isPrep ? 'prep' : ''}">
+            <div>
+              <div class="route-header">
+                <div class="route-info">
+                  ${imgTag}
+                  <div>
+                    <div class="route-name">${r.line_name || '-'}</div>
+                    ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
+                  </div>
+                </div>
+                ${isPrep ? '' : '<div class="arrow">›</div>'}
+              </div>
+              ${cardContent}
+            </div>
           </a>
         `;
       }).join('');
-    })
-    .catch(err => {
-      document.getElementById('loading').innerHTML = '<span style="color:red;">路線データの読み込みに失敗しました。</span>';
+
+      container.appendChild(catTitle);
+      container.appendChild(grid);
     });
+  }
 </script>
+
 </body>
 </html>
