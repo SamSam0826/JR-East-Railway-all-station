@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>東北新幹線∣JR東日本駅一覧</title>
+  <title>東北新幹線(東京～新青森)｜JR東日本駅一覧</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -29,6 +29,8 @@
       --text-muted: #8b949e;
       --bg-card: #0d1117;
       --bg-body: #010409;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -119,7 +121,7 @@
     .advanced-filter-panel { display: none; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
     .advanced-filter-panel.active { display: block; }
     .filter-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-    .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; font-size: 0.85rem; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; font-size: 0.85rem; }
     .filter-grid label { display: flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-header); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); font-weight: 500; }
 
     .loading { text-align: center; padding: 40px; font-weight: 600; color: var(--primary-dark); }
@@ -193,8 +195,6 @@
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: var(--bg-card); border-radius: 12px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
-    
-    /* 閉じるボタンを常に最前面に表示するように修正 */
     .modal-close { position: absolute; top: 16px; right: 18px; font-size: 1.4rem; font-weight: bold; border: none; background: none; cursor: pointer; color: var(--text-muted); z-index: 10; }
     
     .compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
@@ -227,7 +227,7 @@
     
     <h1>
       <img src="新.png" alt="" class="line-symbol" onerror="this.style.display='none'">
-      東北新幹線(東京〜新青森)
+      東北新幹線(東京～新青森)
     </h1>
   </header>
 
@@ -248,7 +248,7 @@
   </div>
 
   <div class="filter-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="検索できます（駅名・所在地・乗り入れ路線名など）" oninput="filterData()">
+    <input type="text" id="searchInput" class="search-input" placeholder="検索できます（駅名・かな・所在地・ナンバリングなど）" oninput="filterData()">
     
     <select id="sortSelect" class="sort-select" onchange="filterData()">
       <option value="default">並び替え: 路線順</option>
@@ -261,9 +261,9 @@
     </select>
 
     <div class="filter-actions">
-      <button class="filter-toggle-btn" id="favFilterBtn" onclick="toggleFavFilter()">お気に入り</button>
-      <button class="filter-toggle-btn" id="stampFilterBtn" onclick="toggleStampFilter()">訪問済み</button>
-      <button class="filter-toggle-btn" onclick="toggleAdvancedFilter()">詳細絞り込み</button>
+      <button class="filter-toggle-btn" id="favFilterBtn" onclick="toggleFavFilter()">⭐ お気に入り</button>
+      <button class="filter-toggle-btn" id="stampFilterBtn" onclick="toggleStampFilter()">🏷️ 訪問済み</button>
+      <button class="filter-toggle-btn" onclick="toggleAdvancedFilter()">⚙️ 詳細絞り込み</button>
     </div>
   </div>
 
@@ -277,14 +277,20 @@
     </div>
     <div class="filter-grid">
       <label><input type="checkbox" class="adv-filter" value="midori" onchange="filterData()"> みどりの窓口あり</label>
+      <label><input type="checkbox" class="adv-filter" value="hanaseru_shiteiseki" onchange="filterData()"> 話せる指定席券売機</label>
+      <label><input type="checkbox" class="adv-filter" value="ekitabi_concierge" onchange="filterData()"> 駅たびコンシェルジュ</label>
       <label><input type="checkbox" class="adv-filter" value="ticket_machine" onchange="filterData()"> 多機能券売機あり</label>
       <label><input type="checkbox" class="adv-filter" value="reserved_ticket_machine" onchange="filterData()"> 指定席券売機あり</label>
       <label><input type="checkbox" class="adv-filter" value="staff" onchange="filterData()"> 駅員配置あり</label>
       <label><input type="checkbox" class="adv-filter" value="suica" onchange="filterData()"> Suica利用可</label>
+      <label><input type="checkbox" class="adv-filter" value="view_altte" onchange="filterData()"> ATM(VIEW ALTTE)</label>
+      <label><input type="checkbox" class="adv-filter" value="coin_locker" onchange="filterData()"> コインロッカーあり</label>
+      <label><input type="checkbox" class="adv-filter" value="station_rencar" onchange="filterData()"> 駅レンタカーあり</label>
+      <label><input type="checkbox" class="adv-filter" value="senior_car" onchange="filterData()"> シニアカー対応等</label>
       <label><input type="checkbox" class="adv-filter" value="toilet" onchange="filterData()"> トイレあり</label>
       <label><input type="checkbox" class="adv-filter" value="elevator" onchange="filterData()"> エレベーターあり</label>
       <label><input type="checkbox" class="adv-filter" value="escalator" onchange="filterData()"> エスカレーターあり</label>
-      <label><input type="checkbox" class="adv-filter" value="accessible_toilet" onchange="filterData()"> バリアフリートイレあり</label>
+      <label><input type="checkbox" class="adv-filter" value="accessible_toilet" onchange="filterData()"> バリアフリートイレ</label>
       <label><input type="checkbox" class="adv-filter" value="braille" onchange="filterData()"> 点字運賃表あり</label>
     </div>
   </div>
@@ -304,9 +310,15 @@
           <th>ホーム</th>
           <th>Suica</th>
           <th>みどり窓口</th>
+          <th>話せる指定席</th>
+          <th>駅たびコンシェルジュ</th>
           <th>多機能券売機</th>
           <th>指定席券売機</th>
           <th>駅員</th>
+          <th>ATM(VIEW)</th>
+          <th>ロッカー</th>
+          <th>レンタカー</th>
+          <th>シニアカー</th>
           <th>トイレ</th>
           <th>エレベーター</th>
           <th>エスカレーター</th>
@@ -582,6 +594,14 @@
             ${selectedStations.map(s => `<td>${fmt(s.midori)}</td>`).join('')}
           </tr>
           <tr>
+            <td>話せる指定席</td>
+            ${selectedStations.map(s => `<td>${fmt(s.hanaseru_shiteiseki)}</td>`).join('')}
+          </tr>
+          <tr>
+            <td>駅たびコンシェルジュ</td>
+            ${selectedStations.map(s => `<td>${fmt(s.ekitabi_concierge)}</td>`).join('')}
+          </tr>
+          <tr>
             <td>多機能券売機</td>
             ${selectedStations.map(s => `<td>${fmt(s.ticket_machine)}</td>`).join('')}
           </tr>
@@ -678,9 +698,15 @@
           <td>${s.platform || '-'}</td>
           <td>${fmt(s.suica)}</td>
           <td>${fmt(s.midori)}</td>
+          <td>${fmt(s.hanaseru_shiteiseki)}</td>
+          <td>${fmt(s.ekitabi_concierge)}</td>
           <td>${fmt(s.ticket_machine)}</td>
           <td>${fmt(s.reserved_ticket_machine)}</td>
           <td>${fmt(s.staff)}</td>
+          <td>${fmt(s.view_altte)}</td>
+          <td>${fmt(s.coin_locker)}</td>
+          <td>${fmt(s.station_rencar)}</td>
+          <td>${fmt(s.senior_car)}</td>
           <td>${fmt(s.toilet)}</td>
           <td>${fmt(s.elevator)}</td>
           <td>${fmt(s.escalator)}</td>
@@ -702,10 +728,16 @@
   function buildCardHTML(s, rank) {
     const facilities = [
       { label: "みどりの窓口", val: s.midori },
+      { label: "話せる指定席券売機", val: s.hanaseru_shiteiseki },
+      { label: "駅たびコンシェルジュ", val: s.ekitabi_concierge },
       { label: "多機能券売機", val: s.ticket_machine },
       { label: "指定席券売機", val: s.reserved_ticket_machine },
       { label: "駅員配置", val: s.staff },
       { label: "Suica利用", val: s.suica },
+      { label: "ATM(VIEW ALTTE)", val: s.view_altte },
+      { label: "コインロッカー", val: s.coin_locker },
+      { label: "駅レンタカー", val: s.station_rencar },
+      { label: "シニアカー対応", val: s.senior_car },
       { label: "トイレ", val: s.toilet },
       { label: "エレベーター", val: s.elevator },
       { label: "エスカレーター", val: s.escalator },
