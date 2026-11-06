@@ -105,10 +105,29 @@
     .view-btn { border: none; background: transparent; padding: 6px 14px; font-weight: 600; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: var(--text-muted); }
     .view-btn.active { background: var(--bg-card); color: var(--primary-dark); box-shadow: var(--shadow-sm); }
 
+    /* --- 支線タブの横並び＆スクロール修正部分 --- */
     .branch-tabs-container { display: none; margin-bottom: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-    .branch-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-    .branch-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text-color); }
-    .branch-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+    .branch-tabs { 
+      display: flex; 
+      flex-wrap: nowrap; /* 絶対に折り返さない */
+      gap: 8px; 
+      overflow-x: auto; /* はみ出したら横スクロール */
+      padding-bottom: 6px; 
+      -webkit-overflow-scrolling: touch; 
+    }
+    .branch-btn { 
+      background: var(--bg-header); 
+      border: 1px solid var(--border-color); 
+      padding: 6px 16px; 
+      border-radius: 20px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 0.85rem; 
+      color: var(--text-color); 
+      white-space: nowrap; /* ボタン内のテキスト改行を禁止 */
+      flex-shrink: 0; /* 画面幅が狭くなってもボタンが縮んで変形するのを防止 */
+    }
+    /* ---------------------------------------- */
 
     .filter-section { background: var(--bg-header); padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
     .search-input { padding: 9px 14px; font-size: 0.9rem; border: 1px solid var(--border-color); border-radius: 6px; flex: 1; min-width: 200px; outline: none; background: var(--bg-card); color: var(--text-color); }
@@ -155,9 +174,11 @@
     
     .card-top-actions { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
     .action-group { display: flex; gap: 6px; align-items: center; }
-    .fav-btn, .stamp-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-muted); }
+    .fav-btn, .stamp-btn, .timetable-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
     .fav-btn.active { background: #fff8c5; color: #9a6700; border-color: #d4a72c; }
     .stamp-btn.active { background: #dafbe1; color: #116329; border-color: #4ac26b; }
+    .timetable-btn:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-color); }
+    
     .compare-check-label { font-size: 0.75rem; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-muted); font-weight: 600; }
 
     @media (min-width: 769px) {
@@ -201,6 +222,32 @@
     .compare-table th, .compare-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: center; }
     .compare-table th { background: var(--bg-header); }
     .compare-chips-box { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 135px; margin: 0 auto; }
+
+    .timetable-header-link {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      transition: background 0.2s;
+    }
+    .timetable-header-link:hover {
+      background: var(--primary-dark);
+    }
+    .transfer-line-badge {
+      display: inline-block;
+      background: var(--bg-header);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin: 4px 0 8px 0;
+      color: var(--primary-dark);
+    }
 
     @media (max-width: 768px) {
       .view-mode-toggle { display: none !important; }
@@ -248,7 +295,7 @@
   </div>
 
   <div class="filter-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="検索できます（駅名・かな・所在地・ナンバリングなど）" oninput="filterData()">
+    <input type="text" id="searchInput" class="search-input" placeholder="駅名・かな・所在地・ナンバリング等で検索..." oninput="filterData()">
     
     <select id="sortSelect" class="sort-select" onchange="filterData()">
       <option value="default">並び替え: 路線順</option>
@@ -328,7 +375,6 @@
           <th>マップ</th>
           <th>Wikipedia</th>
           <th>時刻表</th>
-
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -356,6 +402,7 @@
   const STATION_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
   const currentLine = 'joetsu_shinkansen';
+  const currentLineName = '上越新幹線(東京～新潟)';
   const currentFileName = location.pathname.split('/').pop() || 'joetsu-shinkansen.html';
 
   let allStations = [];
@@ -509,7 +556,7 @@
       compareList.splice(idx, 1);
     } else {
       if (compareList.length >= 4) {
-        alert('比較できるのは最大4駅までです');
+        alert('比較できるのは最大4駅までです！');
         event.target.checked = false;
         return;
       }
@@ -581,7 +628,7 @@
             ${selectedStations.map(s => `<td>${s.platform || '-'}</td>`).join('')}
           </tr>
           <tr>
-            <td>路線数</td>
+            <td>路線数(自路線込)</td>
             ${selectedStations.map(s => {
               const transferCount = s.transfer ? s.transfer.split(/[,、]/).filter(Boolean).length : 0;
               return `<td>${transferCount + 1}路線</td>`;
@@ -614,6 +661,28 @@
         </table>
       </div>
     `;
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  function openTimetableModal(stationName, event) {
+    if (event) event.stopPropagation();
+    const s = allStations.find(item => item.name === stationName);
+    if (!s) return;
+
+    let lines = [currentLineName];
+    if (s.transfer && s.transfer.trim() !== '' && s.transfer.trim() !== '-') {
+      const transferLines = s.transfer.split(/[,、]/).map(l => l.trim()).filter(Boolean);
+      lines = lines.concat(transferLines);
+    }
+
+    const timetableUrl = s.timetable_url && s.timetable_url.trim() !== '' && s.timetable_url !== '-' ? s.timetable_url : null;
+    
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+    `;
+    
+    html += `</div>`;
+
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalOverlay').classList.add('active');
   }
@@ -718,7 +787,6 @@
           <td onclick="event.stopPropagation()">${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
           <td onclick="event.stopPropagation()">${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
           <td onclick="event.stopPropagation()">${s.time_url ? `<a href="${s.time_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
-
         </tr>
       `;
     }).join('');
@@ -812,10 +880,9 @@
 
         <div class="card-links">
           ${s.official_url ? `<a href="${s.official_url}" target="_blank" class="link-btn">公式HP</a>` : ''}
-          ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">Googleマップ </a>` : ''}
+          ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">Googleマップ</a>` : ''}
           ${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">Wikipedia</a>` : ''}
           ${s.time_url ? `<a href="${s.time_url}" target="_blank" class="link-btn">時刻表</a>` : ''}
-
         </div>
       </div>
     `;
