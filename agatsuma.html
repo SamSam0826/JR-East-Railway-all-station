@@ -72,7 +72,6 @@
     .line-symbols-header { display: flex; align-items: center; gap: 4px; }
     .line-symbol { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
 
-    /* お知らせ・路線概要パネル共通 */
     .route-summary-panel, .route-notice-panel {
       background: var(--bg-header);
       border: 1px solid var(--border-color);
@@ -81,7 +80,7 @@
       margin-bottom: 20px;
     }
     .route-notice-panel {
-      border-left: 6px solid #d32f2f; /* お知らせは目立つように赤系アクセント */
+      border-left: 6px solid #d32f2f;
       background: var(--bg-card);
     }
     .summary-title {
@@ -94,9 +93,7 @@
       align-items: center;
       gap: 6px;
     }
-    .notice-title {
-      color: #d32f2f;
-    }
+    .notice-title { color: #d32f2f; }
     .summary-title::-webkit-details-marker { display: none; }
     .summary-title::after { content: '＋ 展開'; margin-left: auto; font-size: 0.75rem; color: var(--text-muted); font-weight: normal; }
     details[open] .summary-title::after { content: '－ 閉じる'; }
@@ -111,12 +108,11 @@
     .summary-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
     .summary-val { font-size: 0.95rem; font-weight: 700; color: var(--text-color); margin-top: 2px; }
 
-    /* お知らせ本文の改行・スタイル設定 */
     .notice-content {
       font-size: 0.9rem;
       color: var(--text-color);
       margin-top: 12px;
-      white-space: pre-wrap; /* スプレッドシートの改行をそのまま反映 */
+      white-space: pre-wrap;
       line-height: 1.6;
     }
 
@@ -166,8 +162,6 @@
     .station-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     
     .card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-    
-    /* 複数ナンバリング画像表示用コンテナ */
     .card-numbering-imgs-container { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex-shrink: 0; }
     .card-numbering-img { height: 50px; width: auto; object-fit: contain; }
 
@@ -239,9 +233,7 @@
       margin-bottom: 16px;
       transition: background 0.2s;
     }
-    .timetable-header-link:hover {
-      background: var(--primary-dark);
-    }
+    .timetable-header-link:hover { background: var(--primary-dark); }
     .transfer-line-badge {
       display: inline-block;
       background: var(--bg-header);
@@ -282,7 +274,6 @@
     </h1>
   </header>
 
-  <!-- お知らせパネル（データがあるときだけ表示） -->
   <details id="noticePanel" class="route-notice-panel" style="display: none;">
     <summary class="summary-title notice-title">🚨 重要なお知らせ・運行情報</summary>
     <div class="notice-content" id="noticeText"></div>
@@ -326,7 +317,7 @@
 
   <div id="advancedFilterPanel" class="advanced-filter-panel">
     <div class="filter-header-row">
-      <span style="font-size: 0.85rem; font-weight: bold;">フィルター</span>
+      <span style="font-size: 0.85rem; font-weight: bold;">詳細フィルター</span>
       <div style="display: flex; gap: 8px;">
         <button class="utility-btn" onclick="setAllFilters(true)" style="padding: 3px 8px; font-size: 0.75rem;">すべて選択</button>
         <button class="utility-btn" onclick="setAllFilters(false)" style="padding: 3px 8px; font-size: 0.75rem;">すべて解除</button>
@@ -383,7 +374,7 @@
           <th>点字運賃表</th>
           <th>公式HP</th>
           <th>マップ</th>
-          <th>Wikipedia</th>
+          <th>Wiki</th>
           <th>時刻表</th>
         </tr>
       </thead>
@@ -453,7 +444,7 @@
     return date.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
-  // 1. 路線データを取得してヘッダーや概要に反映
+  // 1. 路線データを取得（GASからカラーコードも自動取得して適用）
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
@@ -463,10 +454,17 @@
       });
 
       if (lineInfo) {
+        // ★ GASの line_color 列から路線カラーを自動適用！
+        if (lineInfo.line_color && lineInfo.line_color.trim() !== '' && lineInfo.line_color.trim() !== '-') {
+          const mainColor = lineInfo.line_color.trim();
+          document.documentElement.style.setProperty('--primary-color', mainColor);
+          // 簡易的に濃い色や薄い背景色も動的調整（必要に応じて微調整可能）
+          document.documentElement.style.setProperty('--primary-dark', mainColor);
+        }
+
         currentLineName = lineInfo.line_name || '路線';
         document.getElementById('headerLineName').textContent = currentLineName;
 
-        // 上部の複数ナンバリング画像表示
         const numVal = lineInfo.numbering ? lineInfo.numbering.trim() : '';
         if (numVal && numVal !== '-') {
           const codes = numVal.split(/[,、\s]+/).filter(Boolean);
@@ -474,7 +472,6 @@
           document.getElementById('headerSymbols').innerHTML = symbolsHTML;
         }
 
-        // 概要データ
         document.getElementById('sumDistance').textContent = lineInfo.distance || '-';
         document.getElementById('sumStations').textContent = lineInfo.station_count || '-';
         document.getElementById('sumAvgDistance').textContent = lineInfo.avg_distance || '-';
@@ -489,7 +486,6 @@
           summaryGrid.insertBefore(fullOpeningItem, summaryGrid.lastElementChild);
         }
 
-        // お知らせ（notice）の有無チェック＆表示
         if (lineInfo.notice && lineInfo.notice.trim() !== '' && lineInfo.notice.trim() !== '-') {
           document.getElementById('noticeText').textContent = lineInfo.notice;
           document.getElementById('noticePanel').style.display = 'block';
@@ -638,7 +634,7 @@
     const selectedStations = allStations.filter(s => compareList.includes(s.name));
     
     let html = `
-      <h3 style="margin-bottom:12px; font-size:1.1rem;">スペック比較</h3>
+      <h3 style="margin-bottom:12px; font-size:1.1rem;">駅比較</h3>
       <div style="overflow-x:auto;">
         <table class="compare-table">
           <tr>
@@ -715,7 +711,6 @@
       lines = lines.concat(transferLines);
     }
 
-    
     html += `</div>`;
 
     document.getElementById('modalBody').innerHTML = html;
@@ -852,7 +847,6 @@
       { label: "点字運賃表", val: s.braille }
     ];
 
-    // 駅ごとの複数ナンバリング画像対応（numbering_image 列に "JY, JK" のようにカンマ区切りで入力）
     const rawNumImg = s.numbering_image ? s.numbering_image.trim() : '';
     let numImgsHTML = '';
     if (rawNumImg && rawNumImg !== '-') {
