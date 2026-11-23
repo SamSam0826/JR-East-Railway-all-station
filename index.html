@@ -21,7 +21,6 @@
       --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
     }
 
-    /* ダークモード時のカラー変数 */
     body.dark-mode {
       --primary-color: #00aa00;
       --primary-dark: #4caf50;
@@ -86,12 +85,18 @@
       border-left: 6px solid var(--text-muted);
     }
 
-    .route-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .route-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .route-symbol { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
-    .route-name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .route-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
-    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; flex-shrink: 0; }
+    .route-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+    .route-info { display: flex; align-items: flex-start; gap: 10px; min-width: 0; flex: 1; }
+    
+    /* 複数画像を並べるコンテナ＆画像スタイル */
+    .route-symbols-container { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex-shrink: 0; }
+    .route-symbol { height: 38px; width: auto; object-fit: contain; }
+
+    .route-text-area { min-width: 0; flex: 1; }
+    .route-name { font-size: 1.1rem; font-weight: 700; overflow-wrap: break-word; word-break: break-all; white-space: normal; }
+    .route-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; overflow-wrap: break-word; word-break: break-all; white-space: normal; }
+    
+    .arrow { color: var(--primary-color); font-weight: bold; font-size: 1.3rem; flex-shrink: 0; align-self: center; }
 
     .specs-grid {
       display: grid;
@@ -133,28 +138,29 @@
   <header>
     <div>
       <h1>JR東日本 路線一覧</h1>
-      <p class="subtitle"></p>
+      <p class="subtitle">ご覧になりたい路線を選択してください。</p>
     </div>
     <div class="header-btns">
-      <a href="report.html" class="utility-btn">報告する</a>
+      <a href="report.html" class="utility-btn">報告</a>
       <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダーク</button>
     </div>
   </header>
 
   <div class="search-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="検索します（路線名・区間・カテゴリなど）" oninput="filterRoutes()">
+    <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・駅名・所在地等で検索..." oninput="filterRoutes()">
   </div>
 
-  <div id="loading" class="loading">読み込み中...</div>
+  <div id="loading" class="loading">データ読み込み中...</div>
   <div id="routeContainer"></div>
 </div>
 
 <script>
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
+  const STATION_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
   let allRoutes = [];
+  let allStations = [];
 
-  // ダークモード初期化
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
     document.getElementById('darkModeBtn').textContent = '☀️ ライト';
@@ -179,24 +185,56 @@
     });
   }
 
-  fetch(ROUTE_GAS_API_URL)
-    .then(res => res.json())
-    .then(data => {
-      allRoutes = data;
-      document.getElementById('loading').style.display = 'none';
-      renderRoutes(allRoutes);
-    })
-    .catch(err => {
-      console.error('エラー:', err);
-      document.getElementById('loading').innerHTML = '<span style="color:red;">データの読み込みに失敗しました。</span>';
-    });
+  Promise.all([
+    fetch(ROUTE_GAS_API_URL).then(res => res.json()),
+    fetch(STATION_GAS_API_URL).then(res => res.json())
+  ])
+  .then(([routesData, stationsData]) => {
+    allRoutes = routesData;
+    allStations = stationsData;
+    document.getElementById('loading').style.display = 'none';
+    renderRoutes(allRoutes);
+  })
+  .catch(err => {
+    console.error('エラー:', err);
+    document.getElementById('loading').innerHTML = '<span style="color:red;">データの読み込みに失敗しました。</span>';
+  });
 
   function filterRoutes() {
-    const keyword = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allRoutes.filter(r => {
-      const text = `${r.line_name || ''} ${r.section_info || ''} ${r.category || ''} ${r.numbering || ''}`.toLowerCase();
-      return text.includes(keyword);
+    const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+    if (!keyword) {
+      renderRoutes(allRoutes);
+      return;
+    }
+
+    const matchedLineIds = new Set();
+    allStations.forEach(s => {
+      const stationText = `${s.name || ''} ${s.kana || ''} ${s.address || ''}`.toLowerCase();
+      if (stationText.includes(keyword)) {
+        if (s.line_id) {
+          matchedLineIds.add(String(s.line_id).toLowerCase().trim());
+          matchedLineIds.add(String(s.line_id).toLowerCase().replace(/[_]/g, '-').trim());
+          matchedLineIds.add(String(s.line_id).toLowerCase().replace(/[-]/g, '_').trim());
+        }
+      }
     });
+
+    const filtered = allRoutes.filter(r => {
+      // 路線名、読み（kana / reading）、区間、カテゴリ、ナンバリングなどを検索対象に含める
+      const routeText = `${r.line_name || ''} ${r.kana || ''} ${r.reading || ''} ${r.section_info || ''} ${r.category || ''} ${r.numbering || ''}`.toLowerCase();
+      if (routeText.includes(keyword)) return true;
+
+      const fileName = r.html_file ? r.html_file.replace('.html', '').toLowerCase().trim() : '';
+      const fileNameHyphen = fileName.replace(/[_]/g, '-');
+      const fileNameUnder = fileName.replace(/[-]/g, '_');
+
+      if (matchedLineIds.has(fileName) || matchedLineIds.has(fileNameHyphen) || matchedLineIds.has(fileNameUnder)) {
+        return true;
+      }
+
+      return false;
+    });
+
     renderRoutes(filtered);
   }
 
@@ -225,10 +263,15 @@
       grid.className = 'route-grid';
 
       grid.innerHTML = grouped[cat].map(r => {
-        const hasImg = r.numbering && r.numbering.trim() !== '-' && r.numbering.trim() !== '';
-        const imgTag = hasImg ? `<img src="${r.numbering.trim()}.png" alt="${r.numbering}" class="route-symbol" onerror="this.style.display='none'">` : '';
+        // ナンバリング画像の複数対応（カンマやスペース区切りで複数指定可能）
+        const numVal = r.numbering ? r.numbering.trim() : '';
+        let symbolsHTML = '';
+        if (numVal && numVal !== '-') {
+          const codes = numVal.split(/[,、\s]+/).filter(Boolean);
+          symbolsHTML = codes.map(code => `<img src="${code}.png" alt="${code}" class="route-symbol" onerror="this.style.display='none'">`).join('');
+        }
+        const imgContainerTag = symbolsHTML ? `<div class="route-symbols-container">${symbolsHTML}</div>` : '';
 
-        // 準備中（preparation）の判定
         const isPrep = r.preparation && r.preparation.trim() !== '' && r.preparation !== 'FALSE' && r.preparation !== false;
 
         const hasFullOpening = r.full_opening_date && r.full_opening_date.trim() !== '' && r.full_opening_date.trim() !== '-';
@@ -254,8 +297,8 @@
             <div>
               <div class="route-header">
                 <div class="route-info">
-                  ${imgTag}
-                  <div>
+                  ${imgContainerTag}
+                  <div class="route-text-area">
                     <div class="route-name">${r.line_name || '-'}</div>
                     ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
                   </div>
