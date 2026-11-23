@@ -67,15 +67,21 @@
       align-items: center;
       gap: 10px;
       margin: 0;
+      flex-wrap: wrap;
     }
+    .line-symbols-header { display: flex; align-items: center; gap: 4px; }
     .line-symbol { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
 
-    .route-summary-panel {
+    .route-summary-panel, .route-notice-panel {
       background: var(--bg-header);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 14px 18px;
       margin-bottom: 20px;
+    }
+    .route-notice-panel {
+      border-left: 6px solid #d32f2f;
+      background: var(--bg-card);
     }
     .summary-title {
       font-size: 0.9rem;
@@ -87,6 +93,7 @@
       align-items: center;
       gap: 6px;
     }
+    .notice-title { color: #d32f2f; }
     .summary-title::-webkit-details-marker { display: none; }
     .summary-title::after { content: '＋ 展開'; margin-left: auto; font-size: 0.75rem; color: var(--text-muted); font-weight: normal; }
     details[open] .summary-title::after { content: '－ 閉じる'; }
@@ -101,13 +108,21 @@
     .summary-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
     .summary-val { font-size: 0.95rem; font-weight: 700; color: var(--text-color); margin-top: 2px; }
 
+    .notice-content {
+      font-size: 0.9rem;
+      color: var(--text-color);
+      margin-top: 12px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
     .view-mode-toggle { display: flex; background: var(--bg-header); border-radius: 8px; padding: 3px; border: 1px solid var(--border-color); }
     .view-btn { border: none; background: transparent; padding: 6px 14px; font-weight: 600; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: var(--text-muted); }
     .view-btn.active { background: var(--bg-card); color: var(--primary-dark); box-shadow: var(--shadow-sm); }
 
     .branch-tabs-container { display: none; margin-bottom: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-    .branch-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-    .branch-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text-color); }
+    .branch-tabs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+    .branch-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text-color); white-space: nowrap; flex-shrink: 0; }
     .branch-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     .filter-section { background: var(--bg-header); padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
@@ -147,7 +162,9 @@
     .station-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     
     .card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-    .card-numbering-img { height: 50px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .card-numbering-imgs-container { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex-shrink: 0; }
+    .card-numbering-img { height: 50px; width: auto; object-fit: contain; }
+
     .card-title-wrapper { display: flex; align-items: center; gap: 6px; }
     .card-rank-badge { font-size: 0.75rem; background: var(--bg-header); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; font-weight: bold; color: var(--text-muted); }
     .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
@@ -155,9 +172,11 @@
     
     .card-top-actions { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
     .action-group { display: flex; gap: 6px; align-items: center; }
-    .fav-btn, .stamp-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-muted); }
+    .fav-btn, .stamp-btn, .timetable-btn { background: var(--bg-header); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
     .fav-btn.active { background: #fff8c5; color: #9a6700; border-color: #d4a72c; }
     .stamp-btn.active { background: #dafbe1; color: #116329; border-color: #4ac26b; }
+    .timetable-btn:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-color); }
+    
     .compare-check-label { font-size: 0.75rem; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-muted); font-weight: 600; }
 
     @media (min-width: 769px) {
@@ -202,6 +221,30 @@
     .compare-table th { background: var(--bg-header); }
     .compare-chips-box { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 135px; margin: 0 auto; }
 
+    .timetable-header-link {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      transition: background 0.2s;
+    }
+    .timetable-header-link:hover { background: var(--primary-dark); }
+    .transfer-line-badge {
+      display: inline-block;
+      background: var(--bg-header);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin: 4px 0 8px 0;
+      color: var(--primary-dark);
+    }
+
     @media (max-width: 768px) {
       .view-mode-toggle { display: none !important; }
       .table-container { display: none !important; }
@@ -225,11 +268,16 @@
       </div>
     </div>
     
-    <h1>
-      <img src="banetsu_east.png" alt="" class="line-symbol" onerror="this.style.display='none'">
-      磐越東線(いわき～郡山)
+    <h1 id="headerTitle">
+      <div class="line-symbols-header" id="headerSymbols"></div>
+      <span id="headerLineName">読み込み中...</span>
     </h1>
   </header>
+
+  <details id="noticePanel" class="route-notice-panel" style="display: none;">
+    <summary class="summary-title notice-title">お知らせ・運行情報があります</summary>
+    <div class="notice-content" id="noticeText"></div>
+  </details>
 
   <details id="summaryDetails" class="route-summary-panel">
     <summary class="summary-title">📌 路線概要</summary>
@@ -248,7 +296,7 @@
   </div>
 
   <div class="filter-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="検索できます（駅名・かな・所在地・ナンバリングなど）" oninput="filterData()">
+    <input type="text" id="searchInput" class="search-input" placeholder="駅名・かな・所在地・ナンバリング等で検索..." oninput="filterData()">
     
     <select id="sortSelect" class="sort-select" onchange="filterData()">
       <option value="default">並び替え: 路線順</option>
@@ -269,7 +317,7 @@
 
   <div id="advancedFilterPanel" class="advanced-filter-panel">
     <div class="filter-header-row">
-      <span style="font-size: 0.85rem; font-weight: bold;">フィルター</span>
+      <span style="font-size: 0.85rem; font-weight: bold;">詳細フィルター</span>
       <div style="display: flex; gap: 8px;">
         <button class="utility-btn" onclick="setAllFilters(true)" style="padding: 3px 8px; font-size: 0.75rem;">すべて選択</button>
         <button class="utility-btn" onclick="setAllFilters(false)" style="padding: 3px 8px; font-size: 0.75rem;">すべて解除</button>
@@ -326,9 +374,8 @@
           <th>点字運賃表</th>
           <th>公式HP</th>
           <th>マップ</th>
-          <th>Wikipedia</th>
+          <th>Wiki</th>
           <th>時刻表</th>
-
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -355,15 +402,16 @@
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
   const STATION_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
-  const currentLine = 'banetsu_east';
-  const currentFileName = location.pathname.split('/').pop() || 'banetsu-east';
+  const currentFileName = location.pathname.split('/').pop() || 'banetsu-east.html';
+  let currentLineName = '路線';
 
   let allStations = [];
   let currentBranch = '';
   let currentViewMode = 'table';
 
-  let favorites = JSON.parse(localStorage.getItem('jr_fav_' + currentLine) || '[]');
-  let visitedStamps = JSON.parse(localStorage.getItem('jr_stamp_' + currentLine) || '[]');
+  const currentLineId = currentFileName.replace('.html', '');
+  let favorites = JSON.parse(localStorage.getItem('jr_fav_' + currentLineId) || '[]');
+  let visitedStamps = JSON.parse(localStorage.getItem('jr_stamp_' + currentLineId) || '[]');
   let compareList = [];
   let isFavFilterActive = false;
   let isStampFilterActive = false;
@@ -396,11 +444,34 @@
     return date.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
+  // 1. 路線データを取得（GASからカラーコードも自動取得して適用）
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
-      const lineInfo = data.find(r => r.html_file === currentFileName);
+      const lineInfo = data.find(r => {
+        const file = r.html_file ? r.html_file.trim().toLowerCase() : '';
+        return file === currentFileName.toLowerCase() || file.replace('.html', '') === currentLineId.toLowerCase();
+      });
+
       if (lineInfo) {
+        // ★ GASの line_color 列から路線カラーを自動適用！
+        if (lineInfo.line_color && lineInfo.line_color.trim() !== '' && lineInfo.line_color.trim() !== '-') {
+          const mainColor = lineInfo.line_color.trim();
+          document.documentElement.style.setProperty('--primary-color', mainColor);
+          // 簡易的に濃い色や薄い背景色も動的調整（必要に応じて微調整可能）
+          document.documentElement.style.setProperty('--primary-dark', mainColor);
+        }
+
+        currentLineName = lineInfo.line_name || '路線';
+        document.getElementById('headerLineName').textContent = currentLineName;
+
+        const numVal = lineInfo.numbering ? lineInfo.numbering.trim() : '';
+        if (numVal && numVal !== '-') {
+          const codes = numVal.split(/[,、\s]+/).filter(Boolean);
+          const symbolsHTML = codes.map(code => `<img src="${code}.png" alt="${code}" class="line-symbol" onerror="this.style.display='none'">`).join('');
+          document.getElementById('headerSymbols').innerHTML = symbolsHTML;
+        }
+
         document.getElementById('sumDistance').textContent = lineInfo.distance || '-';
         document.getElementById('sumStations').textContent = lineInfo.station_count || '-';
         document.getElementById('sumAvgDistance').textContent = lineInfo.avg_distance || '-';
@@ -414,14 +485,25 @@
           fullOpeningItem.innerHTML = `<span class="summary-label">全通年月日</span><span class="summary-val">${formatDate(lineInfo.full_opening_date)}</span>`;
           summaryGrid.insertBefore(fullOpeningItem, summaryGrid.lastElementChild);
         }
+
+        if (lineInfo.notice && lineInfo.notice.trim() !== '' && lineInfo.notice.trim() !== '-') {
+          document.getElementById('noticeText').textContent = lineInfo.notice;
+          document.getElementById('noticePanel').style.display = 'block';
+        }
+      } else {
+        document.getElementById('headerLineName').textContent = currentLineId;
       }
     })
     .catch(err => console.error('路線概要データ取得エラー:', err));
 
+  // 2. 駅データを取得
   fetch(STATION_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
-      allStations = data.filter(s => !s.line_id || s.line_id === currentLine);
+      allStations = data.filter(s => {
+        if (!s.line_id) return true;
+        return String(s.line_id).trim().toLowerCase() === currentLineId.toLowerCase();
+      });
       document.getElementById('loadingView').style.display = 'none';
       setupBranchTabs(allStations);
       updateViewVisibility();
@@ -478,7 +560,7 @@
     } else {
       favorites.push(stationName);
     }
-    localStorage.setItem('jr_fav_' + currentLine, JSON.stringify(favorites));
+    localStorage.setItem('jr_fav_' + currentLineId, JSON.stringify(favorites));
     render();
   }
 
@@ -489,7 +571,7 @@
     } else {
       visitedStamps.push(stationName);
     }
-    localStorage.setItem('jr_stamp_' + currentLine, JSON.stringify(visitedStamps));
+    localStorage.setItem('jr_stamp_' + currentLineId, JSON.stringify(visitedStamps));
     updateStampProgress();
     render();
   }
@@ -581,7 +663,7 @@
             ${selectedStations.map(s => `<td>${s.platform || '-'}</td>`).join('')}
           </tr>
           <tr>
-            <td>路線数</td>
+            <td>路線数(自路線込)</td>
             ${selectedStations.map(s => {
               const transferCount = s.transfer ? s.transfer.split(/[,、]/).filter(Boolean).length : 0;
               return `<td>${transferCount + 1}路線</td>`;
@@ -614,6 +696,23 @@
         </table>
       </div>
     `;
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  function openTimetableModal(stationName, event) {
+    if (event) event.stopPropagation();
+    const s = allStations.find(item => item.name === stationName);
+    if (!s) return;
+
+    let lines = [currentLineName];
+    if (s.transfer && s.transfer.trim() !== '' && s.transfer.trim() !== '-') {
+      const transferLines = s.transfer.split(/[,、]/).map(l => l.trim()).filter(Boolean);
+      lines = lines.concat(transferLines);
+    }
+
+    html += `</div>`;
+
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalOverlay').classList.add('active');
   }
@@ -718,7 +817,6 @@
           <td onclick="event.stopPropagation()">${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
           <td onclick="event.stopPropagation()">${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
           <td onclick="event.stopPropagation()">${s.time_url ? `<a href="${s.time_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
-
         </tr>
       `;
     }).join('');
@@ -750,9 +848,16 @@
     ];
 
     const rawNumImg = s.numbering_image ? s.numbering_image.trim() : '';
-    const formattedNumImg = rawNumImg.replace(/^([A-Za-z]+)(\d+)/, '$1-$2');
-    const imgFileName = formattedNumImg && s.name ? `${formattedNumImg}-${s.name}.png` : '';
-    const numImgTag = imgFileName ? `<img src="${imgFileName}" alt="" class="card-numbering-img" onerror="this.style.display='none'">` : '';
+    let numImgsHTML = '';
+    if (rawNumImg && rawNumImg !== '-') {
+      const codes = rawNumImg.split(/[,、\s]+/).filter(Boolean);
+      numImgsHTML = codes.map(code => {
+        const formatted = code.replace(/^([A-Za-z]+)(\d+)/, '$1-$2');
+        const imgName = formatted && s.name ? `${formatted}-${s.name}.png` : '';
+        return imgName ? `<img src="${imgName}" alt="" class="card-numbering-img" onerror="this.style.display='none'">` : '';
+      }).join('');
+    }
+    const numImgContainerTag = numImgsHTML ? `<div class="card-numbering-imgs-container">${numImgsHTML}</div>` : '';
 
     let numberingBoxHTML = '';
     if (s.numbering && s.numbering.trim() !== '' && s.numbering.trim() !== '-') {
@@ -785,7 +890,7 @@
         </div>
 
         <div class="card-header">
-          ${numImgTag}
+          ${numImgContainerTag}
           <div class="card-title-area">
             <div class="card-title-wrapper">
               <span class="card-rank-badge">#${rank}</span>
@@ -815,7 +920,6 @@
           ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">Googleマップ</a>` : ''}
           ${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">Wikipedia</a>` : ''}
           ${s.time_url ? `<a href="${s.time_url}" target="_blank" class="link-btn">時刻表</a>` : ''}
-
         </div>
       </div>
     `;
