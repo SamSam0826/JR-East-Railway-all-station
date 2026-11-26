@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>吾妻線(高崎～大前)｜JR東日本駅一覧</title>
+  <title>JR駅詳細データベース</title>
   <style>
     :root {
       --primary-color: #008000;
@@ -259,23 +259,23 @@
     <div class="header-top-bar">
       <a href="index.html" class="back-btn">‹ 路線一覧へ</a>
       <div class="header-buttons">
-        <a href="report.html" class="utility-btn">報告する</a>
-        <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダーク</button>
+        <a href="report.html" class="utility-btn">📢 報告する</a>
+        <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダークモード</button>
         <div class="view-mode-toggle">
-          <button class="view-btn active" id="btnTableView" onclick="setViewMode('table')">表</button>
-          <button class="view-btn" id="btnCardView" onclick="setViewMode('card')">カード</button>
+          <button class="view-btn active" id="btnTableView" onclick="setViewMode('table')">📊 表表示</button>
+          <button class="view-btn" id="btnCardView" onclick="setViewMode('card')">🎴 カード表示</button>
         </div>
       </div>
     </div>
     
     <h1 id="headerTitle">
       <div class="line-symbols-header" id="headerSymbols"></div>
-      <span id="headerLineName">読み込み中...</span>
+      <span id="headerLineName">読み込み中...</span> 駅詳細データベース
     </h1>
   </header>
 
   <details id="noticePanel" class="route-notice-panel" style="display: none;">
-    <summary class="summary-title notice-title">お知らせ・運行情報があります</summary>
+    <summary class="summary-title notice-title">🚨 重要なお知らせ・運行情報</summary>
     <div class="notice-content" id="noticeText"></div>
   </details>
 
@@ -299,7 +299,7 @@
     <input type="text" id="searchInput" class="search-input" placeholder="駅名・かな・所在地・ナンバリング等で検索..." oninput="filterData()">
     
     <select id="sortSelect" class="sort-select" onchange="filterData()">
-      <option value="default">並び替え: 路線順</option>
+      <option value="default">↕️ 並び替え: 路線順</option>
       <option value="kana_asc">五十音順 (あ → ん)</option>
       <option value="kana_desc">五十音順 (ん → あ)</option>
       <option value="length_desc">駅名の長い順</option>
@@ -317,7 +317,7 @@
 
   <div id="advancedFilterPanel" class="advanced-filter-panel">
     <div class="filter-header-row">
-      <span style="font-size: 0.85rem; font-weight: bold;">詳細フィルター</span>
+      <span style="font-size: 0.85rem; font-weight: bold;">詳細フィルター選択</span>
       <div style="display: flex; gap: 8px;">
         <button class="utility-btn" onclick="setAllFilters(true)" style="padding: 3px 8px; font-size: 0.75rem;">すべて選択</button>
         <button class="utility-btn" onclick="setAllFilters(false)" style="padding: 3px 8px; font-size: 0.75rem;">すべて解除</button>
@@ -343,7 +343,7 @@
     </div>
   </div>
 
-  <div id="loadingView" class="loading">読み込み中...</div>
+  <div id="loadingView" class="loading">Googleスプレッドシートから最新データを読み込み中...</div>
 
   <div class="table-container" id="tableView" style="display: none;">
     <table>
@@ -372,10 +372,10 @@
           <th>エスカレーター</th>
           <th>バリアフリートイレ</th>
           <th>点字運賃表</th>
+          <th>時刻表</th>
           <th>公式HP</th>
           <th>マップ</th>
           <th>Wiki</th>
-          <th>時刻表</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -387,7 +387,7 @@
 
 <div class="compare-float-bar" id="compareFloatBar">
   <span id="compareCountText" style="font-size: 0.9rem; font-weight: bold;">0件選択中</span>
-  <button class="compare-execute-btn" id="compareExecBtn" onclick="openCompareModal()" disabled>比較する</button>
+  <button class="compare-execute-btn" id="compareExecBtn" onclick="openCompareModal()" disabled>📊 比較する</button>
   <button class="utility-btn" onclick="clearComparison()" style="padding: 4px 8px; font-size: 0.75rem;">解除</button>
 </div>
 
@@ -402,7 +402,7 @@
   const ROUTE_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz-R-oAHXwQ0NOO8F-dOPA8L2UOwyIVMQ-EQhfeWZFwSHv4_Or35P7OdQEhEttcoYMO/exec';
   const STATION_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxh5LcHoLRDxltOtVfIhfyMwwC-bAM_cSZS9r6n8dbm805furHTRX3BVbmAe8uMHhX26w/exec';
 
-  const currentFileName = location.pathname.split('/').pop() || 'agatsuma.html';
+  const currentFileName = location.pathname.split('/').pop() || 'yamanote.html';
   let currentLineName = '路線';
 
   let allStations = [];
@@ -418,7 +418,7 @@
 
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
-    document.getElementById('darkModeBtn').textContent = '☀️ ライト';
+    document.getElementById('darkModeBtn').textContent = '☀️ ライトモード';
   }
 
   if (window.innerWidth > 768) {
@@ -429,7 +429,7 @@
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     localStorage.setItem('jr_dark_mode', isDark);
-    document.getElementById('darkModeBtn').textContent = isDark ? '☀️ ライト' : '🌙 ダーク';
+    document.getElementById('darkModeBtn').textContent = isDark ? '☀️ ライトモード' : '🌙 ダークモード';
   }
 
   function setAllFilters(checked) {
@@ -444,7 +444,7 @@
     return date.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
-  // 1. 路線データを取得（GASからカラーコードも自動取得して適用）
+  // 1. 路線データを取得（GASからカラーコード・路線名・タイトル・お知らせをすべて自動連動）
   fetch(ROUTE_GAS_API_URL)
     .then(res => res.json())
     .then(data => {
@@ -454,16 +454,17 @@
       });
 
       if (lineInfo) {
-        // ★ GASの line_color 列から路線カラーを自動適用！
         if (lineInfo.line_color && lineInfo.line_color.trim() !== '' && lineInfo.line_color.trim() !== '-') {
           const mainColor = lineInfo.line_color.trim();
           document.documentElement.style.setProperty('--primary-color', mainColor);
-          // 簡易的に濃い色や薄い背景色も動的調整（必要に応じて微調整可能）
           document.documentElement.style.setProperty('--primary-dark', mainColor);
         }
 
         currentLineName = lineInfo.line_name || '路線';
         document.getElementById('headerLineName').textContent = currentLineName;
+        
+        // ★ ブラウザのタブタイトルもGASから自動設定！
+        document.title = `${currentLineName} 駅詳細データベース`;
 
         const numVal = lineInfo.numbering ? lineInfo.numbering.trim() : '';
         if (numVal && numVal !== '-') {
@@ -492,6 +493,7 @@
         }
       } else {
         document.getElementById('headerLineName').textContent = currentLineId;
+        document.title = `${currentLineId} 駅詳細データベース`;
       }
     })
     .catch(err => console.error('路線概要データ取得エラー:', err));
@@ -591,7 +593,7 @@
       compareList.splice(idx, 1);
     } else {
       if (compareList.length >= 4) {
-        alert('比較できるのは最大4駅までです');
+        alert('比較できるのは最大4駅までです！');
         event.target.checked = false;
         return;
       }
@@ -634,7 +636,7 @@
     const selectedStations = allStations.filter(s => compareList.includes(s.name));
     
     let html = `
-      <h3 style="margin-bottom:12px; font-size:1.1rem;">駅比較</h3>
+      <h3 style="margin-bottom:12px; font-size:1.1rem;">📊 駅スペック比較</h3>
       <div style="overflow-x:auto;">
         <table class="compare-table">
           <tr>
@@ -710,6 +712,31 @@
       const transferLines = s.transfer.split(/[,、]/).map(l => l.trim()).filter(Boolean);
       lines = lines.concat(transferLines);
     }
+
+    const timetableUrl = s.timetable_url && s.timetable_url.trim() !== '' && s.timetable_url !== '-' ? s.timetable_url : null;
+
+    let html = `
+      <h3 style="margin-bottom:8px; font-size:1.2rem;">📅 ${s.name}駅 の時刻表</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">この駅に乗り入しているすべての路線の時刻表情報です。</p>
+      
+      ${timetableUrl ? `<a href="${timetableUrl}" target="_blank" class="timetable-header-link">🔗 詳細はこちら（公式時刻表ページへ ↗）</a>` : '<div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">※公式時刻表URL未登録</div>'}
+
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+    `;
+
+    lines.forEach(lineName => {
+      html += `
+        <div style="background:var(--bg-header); border:1px solid var(--border-color); border-radius:8px; padding:12px;">
+          <div class="transfer-line-badge">🚆 ${lineName}</div>
+          <div style="font-size:0.85rem; color:var(--text-color); margin-top:4px;">
+            ホーム情報: ${s.platform || '通常ホーム'} / 営業キロ: ${s.distance || '-'}
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px; background:var(--bg-card); padding:8px; border-radius:4px; border:1px dashed var(--border-color);">
+            ここに${lineName}の時刻表データ（発車時刻や方向別リストなど）が表示されます。
+          </div>
+        </div>
+      `;
+    });
 
     html += `</div>`;
 
@@ -813,10 +840,10 @@
           <td>${fmt(s.escalator)}</td>
           <td>${fmt(s.accessible_toilet)}</td>
           <td>${fmt(s.braille)}</td>
+          <td onclick="event.stopPropagation()"><button class="timetable-btn" onclick="openTimetableModal('${s.name}', event)">📅 時刻表</button></td>
           <td onclick="event.stopPropagation()">${s.official_url ? `<a href="${s.official_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
           <td onclick="event.stopPropagation()">${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
           <td onclick="event.stopPropagation()">${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
-          <td onclick="event.stopPropagation()">${s.time_url ? `<a href="${s.time_url}" target="_blank" class="link-btn">こちら</a>` : '-'}</td>
         </tr>
       `;
     }).join('');
@@ -883,6 +910,7 @@
           <div class="action-group">
             <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${s.name}', event)">${isFav ? '⭐ お気に入り中' : '☆ お気に入り'}</button>
             <button class="stamp-btn ${isStamped ? 'active' : ''}" onclick="toggleStamp('${s.name}', event)">${isStamped ? '🏷️ 訪問済み！' : '📌 未訪問'}</button>
+            <button class="timetable-btn" onclick="openTimetableModal('${s.name}', event)">📅 時刻表</button>
           </div>
           <label class="compare-check-label" onclick="event.stopPropagation()">
             <input type="checkbox" ${isCompared ? 'checked' : ''} onchange="toggleCompare('${s.name}', event)"> 比較
@@ -916,10 +944,9 @@
         </div>
 
         <div class="card-links">
-          ${s.official_url ? `<a href="${s.official_url}" target="_blank" class="link-btn">公式HP</a>` : ''}
-          ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">Googleマップ</a>` : ''}
-          ${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">Wikipedia</a>` : ''}
-          ${s.time_url ? `<a href="${s.time_url}" target="_blank" class="link-btn">時刻表</a>` : ''}
+          ${s.official_url ? `<a href="${s.official_url}" target="_blank" class="link-btn">公式HP ↗</a>` : ''}
+          ${s.map_url ? `<a href="${s.map_url}" target="_blank" class="link-btn">Googleマップ ↗</a>` : ''}
+          ${s.wikipedia_url ? `<a href="${s.wikipedia_url}" target="_blank" class="link-btn">Wikipedia ↗</a>` : ''}
         </div>
       </div>
     `;
