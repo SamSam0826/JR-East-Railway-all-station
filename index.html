@@ -138,11 +138,11 @@
   <header>
     <div>
       <h1>JR東日本 路線一覧</h1>
-      <p class="subtitle">ご覧になりたい路線を選択してください。</p>
+      <p class="subtitle">ご覧になりたい路線を選択してください。駅一覧ページにアクセスできます。</p>
     </div>
     <div class="header-btns">
-      <a href="report.html" class="utility-btn">報告</a>
-      <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 ダーク</button>
+      <a href="report.html" class="utility-btn">報告する</a>
+      <button class="utility-btn" id="darkModeBtn" onclick="toggleDarkMode()">ダーク</button>
     </div>
   </header>
 
@@ -150,7 +150,7 @@
     <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・駅名・所在地等で検索..." oninput="filterRoutes()">
   </div>
 
-  <div id="loading" class="loading">データ読み込み中...</div>
+  <div id="loading" class="loading">読み込み中...</div>
   <div id="routeContainer"></div>
 </div>
 
@@ -163,14 +163,14 @@
 
   if (localStorage.getItem('jr_dark_mode') === 'true') {
     document.body.classList.add('dark-mode');
-    document.getElementById('darkModeBtn').textContent = '☀️ ライト';
+    document.getElementById('darkModeBtn').textContent = 'ライト';
   }
 
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     localStorage.setItem('jr_dark_mode', isDark);
-    document.getElementById('darkModeBtn').textContent = isDark ? '☀️ ライト' : '🌙 ダーク';
+    document.getElementById('darkModeBtn').textContent = isDark ? 'ライト' : 'ダーク';
   }
 
   function formatDate(isoString) {
