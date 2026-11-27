@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSVファイルの文字化けについて｜JR東日本駅一覧</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1f2328; background: #f4f6f8; line-height: 1.6; padding: 30px 15px; }
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #d0d7de; }
+    h1 { font-size: 1.5rem; border-bottom: 2px solid #008000; padding-bottom: 10px; margin-bottom: 20px; color: #005900; }
+    h2 { font-size: 1.1rem; margin-top: 24px; margin-bottom: 8px; color: #1f2328; }
+    p, li { font-size: 0.95rem; margin-bottom: 10px; color: #333; }
+    ol, ul { padding-left: 20px; margin-bottom: 15px; }
+    .back-link { display: inline-block; margin-top: 20px; text-decoration: none; color: #0969da; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>CSVファイルの文字化け解消ガイド</h1>
+  <p>ExcelなどでCSVファイルを開いた際に文字化けしてしまう場合は、以下のいずれかの方法でお試しください。</p>
+
+  <h2>方法1：Excelの「データ」機能を使って開く（推奨・簡単）</h2>
+  <ol>
+    <li>Excelを新規に開き、空白のブックを開きます。
+    <li>上部メニューの<strong>「データ」</strong>タブをクリックします。</li>
+    <li><strong>「テキストまたはCSVから」</strong>をクリックし、ダウンロードしたCSVファイルを選択します。</li>
+    <li>プレビュー画面が表示されたら、「ファイルの元コード」を<strong>「65001 : Unicode (UTF-8)」</strong>に指定して読み込みます。</li>
+  </ol>
+
+  <h2>方法2：TXT形式でダウンロードする</h2>
+  <p>ダウンロードモーダルで「CSV形式」ではなく<strong>「TXT形式」</strong>を選択してダウンロードすると、タブ区切りテキストとして文字化けせずに開きやすくなります。</p>
+
+  <a href="javascript:window.close();" class="back-link">‹ このヘルプ画面を閉じる</a>
+</div>
+
+</body>
+</html>
