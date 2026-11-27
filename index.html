@@ -45,18 +45,20 @@
     h1 { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
     p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
 
-    .header-btns { display: flex; gap: 8px; align-items: center; }
+    .header-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .utility-btn { text-decoration: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 6px 12px; background: var(--bg-header); border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; }
     .utility-btn:hover { background: var(--primary-light); color: var(--primary-dark); }
 
-    .search-section { margin-bottom: 20px; }
-    .search-input { width: 100%; padding: 12px 16px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: var(--bg-card); color: var(--text-color); }
+    /* 検索・並び替えセクション */
+    .filter-section { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .search-input { padding: 10px 14px; font-size: 0.95rem; border: 1px solid var(--border-color); border-radius: 8px; flex: 1; min-width: 220px; outline: none; background: var(--bg-card); color: var(--text-color); transition: 0.2s; }
     .search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,128,0,0.1); }
+    .sort-select { padding: 9px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-color); font-weight: 600; outline: none; cursor: pointer; }
 
     .loading { text-align: center; padding: 50px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
     .no-result { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; }
 
-    .section-title { font-size: 1.15rem; font-weight: 700; margin: 25px 0 12px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); }
+    .section-title { font-size: 1.15rem; font-weight: 700; margin: 25px 0 12px 0; border-left: 5px solid var(--primary-color); padding-left: 10px; color: var(--text-color); display: flex; align-items: center; gap: 8px; }
 
     .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; width: 100%; }
 
@@ -66,6 +68,8 @@
       justify-content: space-between;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
+      /* 各路線の line_color がインラインスタイルでここに適用されます */
+      border-left: 6px solid var(--primary-color);
       border-radius: 10px;
       padding: 16px;
       text-decoration: none;
@@ -73,6 +77,7 @@
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
       width: 100%;
+      position: relative;
     }
     .route-card:hover {
       transform: translateY(-2px);
@@ -82,13 +87,12 @@
     .route-card.prep {
       opacity: 0.55;
       pointer-events: none;
-      border-left: 6px solid var(--text-muted);
+      border-left: 6px solid var(--text-muted) !important;
     }
 
-    .route-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+    .route-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
     .route-info { display: flex; align-items: flex-start; gap: 10px; min-width: 0; flex: 1; }
     
-    /* 複数画像を並べるコンテナ＆画像スタイル */
     .route-symbols-container { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex-shrink: 0; }
     .route-symbol { height: 38px; width: auto; object-fit: contain; }
 
@@ -112,6 +116,13 @@
     .spec-item { display: flex; flex-direction: column; }
     .spec-label { color: var(--text-muted); font-size: 0.7rem; font-weight: 600; }
     .spec-val { font-weight: 700; color: var(--text-color); }
+
+    /* 各カードごとの運行情報ボタン・展開エリア */
+    .route-notice-box { margin-top: 8px; border-top: 1px dashed var(--spec-border); padding-top: 8px; }
+    .notice-toggle-btn { background: #fdf2f2; color: #d32f2f; border: 1px solid #f5c6cb; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .notice-toggle-btn:hover { background: #f8d7da; }
+    .card-notice-content { font-size: 0.8rem; color: #d32f2f; background: #fff5f5; border: 1px solid #f5c6cb; padding: 8px; border-radius: 6px; margin-top: 6px; white-space: pre-wrap; line-height: 1.5; display: none; }
+    .card-notice-content.active { display: block; }
 
     .prep-message {
       font-size: 0.9rem;
@@ -146,8 +157,22 @@
     </div>
   </header>
 
-  <div class="search-section">
-    <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・駅名・所在地等で検索..." oninput="filterRoutes()">
+  <div class="filter-section">
+    <input type="text" id="searchInput" class="search-input" placeholder="路線名・区間・駅名・所在地等で検索..." oninput="filterAndRender()">
+    
+    <select id="sortSelect" class="sort-select" onchange="filterAndRender()">
+      <option value="default">並び替え: 路線順</option>
+      <option value="kana_asc">五十音順 (あ → ん)</option>
+      <option value="kana_desc">五十音順 (ん → あ)</option>
+      <option value="stations_desc">駅数が多い順</option>
+      <option value="stations_asc">駅数が少ない順</option>
+      <option value="distance_desc">営業キロが長い順</option>
+      <option value="distance_asc">営業キロが短い順</option>
+      <option value="avg_desc">平均駅間距離が長い順</option>
+      <option value="avg_asc">平均駅間距離が短い順</option>
+      <option value="opening_asc">開業日が古い順</option>
+      <option value="opening_desc">開業日が新しい順</option>
+    </select>
   </div>
 
   <div id="loading" class="loading">読み込み中...</div>
@@ -173,16 +198,61 @@
     document.getElementById('darkModeBtn').textContent = isDark ? 'ライト' : 'ダーク';
   }
 
-  function formatDate(isoString) {
-    if (!isoString) return '-';
-    const date = new Date(isoString);
-    if (isNaN(date.getTime())) return isoString;
-    return date.toLocaleDateString('ja-JP', {
+  function extractDateObj(val) {
+    if (!val || String(val).trim() === '' || String(val).trim() === '-') return null;
+    const str = String(val).trim();
+
+    const jpMatch = str.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+    if (jpMatch) {
+      const y = parseInt(jpMatch[1], 10);
+      const m = parseInt(jpMatch[2], 10) - 1;
+      const d = parseInt(jpMatch[3], 10);
+      const dt = new Date(y, m, d);
+      if (!isNaN(dt.getTime())) return dt;
+    }
+
+    const cleaned = str.replace(/[\(（][^\)）]*[\)）]/g, '').trim();
+    const parsed = new Date(cleaned);
+    if (!isNaN(parsed.getTime())) return parsed;
+
+    const numMatch = cleaned.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if (numMatch) {
+      const dt = new Date(parseInt(numMatch[1], 10), parseInt(numMatch[2], 10) - 1, parseInt(numMatch[3], 10));
+      if (!isNaN(dt.getTime())) return dt;
+    }
+
+    return null;
+  }
+
+  function formatDate(val) {
+    if (!val || String(val).trim() === '' || String(val).trim() === '-') return '-';
+    const str = String(val).trim();
+    if (str.includes('年') && str.includes('月') && str.includes('日')) {
+      return str;
+    }
+    const dateObj = extractDateObj(str);
+    if (!dateObj) return str;
+    return dateObj.toLocaleDateString('ja-JP', {
       timeZone: 'Asia/Tokyo',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      weekday: 'short'
     });
+  }
+
+  function parseDateValue(val) {
+    const dt = extractDateObj(val);
+    return dt ? dt.getTime() : null;
+  }
+
+  function parseNumeric(val) {
+    if (val === undefined || val === null || String(val).trim() === '' || String(val).trim() === '-') return null;
+    const str = String(val);
+    const matched = str.match(/[\d.]+/);
+    if (!matched) return null;
+    const num = parseFloat(matched[0]);
+    return isNaN(num) ? null : num;
   }
 
   Promise.all([
@@ -193,34 +263,33 @@
     allRoutes = routesData;
     allStations = stationsData;
     document.getElementById('loading').style.display = 'none';
-    renderRoutes(allRoutes);
+    filterAndRender();
   })
   .catch(err => {
     console.error('エラー:', err);
     document.getElementById('loading').innerHTML = '<span style="color:red;">データの読み込みに失敗しました。</span>';
   });
 
-  function filterRoutes() {
+  function filterAndRender() {
     const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-    if (!keyword) {
-      renderRoutes(allRoutes);
-      return;
-    }
+    const sortVal = document.getElementById('sortSelect').value;
 
     const matchedLineIds = new Set();
-    allStations.forEach(s => {
-      const stationText = `${s.name || ''} ${s.kana || ''} ${s.address || ''}`.toLowerCase();
-      if (stationText.includes(keyword)) {
-        if (s.line_id) {
-          matchedLineIds.add(String(s.line_id).toLowerCase().trim());
-          matchedLineIds.add(String(s.line_id).toLowerCase().replace(/[_]/g, '-').trim());
-          matchedLineIds.add(String(s.line_id).toLowerCase().replace(/[-]/g, '_').trim());
+    if (keyword) {
+      allStations.forEach(s => {
+        const stationText = `${s.name || ''} ${s.kana || ''} ${s.address || ''}`.toLowerCase();
+        if (stationText.includes(keyword)) {
+          if (s.line_id) {
+            matchedLineIds.add(String(s.line_id).toLowerCase().trim());
+            matchedLineIds.add(String(s.line_id).toLowerCase().replace(/[_]/g, '-').trim());
+            matchedLineIds.add(String(s.line_id).toLowerCase().replace(/[-]/g, '_').trim());
+          }
         }
-      }
-    });
+      });
+    }
 
-    const filtered = allRoutes.filter(r => {
-      // 路線名、読み（kana / reading）、区間、カテゴリ、ナンバリングなどを検索対象に含める
+    let filtered = allRoutes.filter(r => {
+      if (!keyword) return true;
       const routeText = `${r.line_name || ''} ${r.kana || ''} ${r.reading || ''} ${r.section_info || ''} ${r.category || ''} ${r.numbering || ''}`.toLowerCase();
       if (routeText.includes(keyword)) return true;
 
@@ -235,85 +304,156 @@
       return false;
     });
 
-    renderRoutes(filtered);
-  }
+    filtered.sort((a, b) => {
+      if (sortVal === 'kana_asc') {
+        const keyA = a.kana && a.kana.trim() !== '-' ? a.kana.trim() : (a.line_name || '').trim();
+        const keyB = b.kana && b.kana.trim() !== '-' ? b.kana.trim() : (b.line_name || '').trim();
+        return keyA.localeCompare(keyB, 'ja');
+      } else if (sortVal === 'kana_desc') {
+        const keyA = a.kana && a.kana.trim() !== '-' ? a.kana.trim() : (a.line_name || '').trim();
+        const keyB = b.kana && b.kana.trim() !== '-' ? b.kana.trim() : (b.line_name || '').trim();
+        return keyB.localeCompare(keyA, 'ja');
+      } else if (sortVal === 'stations_desc' || sortVal === 'stations_asc') {
+        const numA = parseNumeric(a.station_count);
+        const numB = parseNumeric(b.station_count);
+        if (numA === null && numB === null) return 0;
+        if (numA === null) return 1;
+        if (numB === null) return -1;
+        return sortVal === 'stations_desc' ? numB - numA : numA - numB;
+      } else if (sortVal === 'distance_desc' || sortVal === 'distance_asc') {
+        const numA = parseNumeric(a.distance);
+        const numB = parseNumeric(b.distance);
+        if (numA === null && numB === null) return 0;
+        if (numA === null) return 1;
+        if (numB === null) return -1;
+        return sortVal === 'distance_desc' ? numB - numA : numA - numB;
+      } else if (sortVal === 'avg_desc' || sortVal === 'avg_asc') {
+        const numA = parseNumeric(a.avg_distance);
+        const numB = parseNumeric(b.avg_distance);
+        if (numA === null && numB === null) return 0;
+        if (numA === null) return 1;
+        if (numB === null) return -1;
+        return sortVal === 'avg_desc' ? numB - numA : numA - numB;
+      } else if (sortVal === 'opening_asc' || sortVal === 'opening_desc') {
+        const timeA = parseDateValue(a.opening_date);
+        const timeB = parseDateValue(b.opening_date);
+        if (timeA === null && timeB === null) return 0;
+        if (timeA === null) return 1;
+        if (timeB === null) return -1;
+        return sortVal === 'opening_asc' ? timeA - timeB : timeB - timeA;
+      }
+      return 0;
+    });
 
-  function renderRoutes(routes) {
     const container = document.getElementById('routeContainer');
     container.innerHTML = '';
 
-    if (routes.length === 0) {
+    if (filtered.length === 0) {
       container.innerHTML = '<div class="no-result">一致する路線が見つかりませんでした。</div>';
       return;
     }
 
-    const grouped = {};
-    routes.forEach(r => {
-      const cat = r.category || 'その他路線';
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push(r);
-    });
+    if (sortVal === 'default') {
+      const grouped = {};
+      filtered.forEach(r => {
+        const cat = r.category || 'その他路線';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(r);
+      });
 
-    Object.keys(grouped).forEach(cat => {
-      const catTitle = document.createElement('div');
-      catTitle.className = 'section-title';
-      catTitle.textContent = cat;
+      Object.keys(grouped).forEach(cat => {
+        const catTitle = document.createElement('div');
+        catTitle.className = 'section-title';
+        catTitle.textContent = cat;
 
+        const grid = document.createElement('div');
+        grid.className = 'route-grid';
+        grid.innerHTML = grouped[cat].map(r => buildRouteCardHTML(r)).join('');
+
+        container.appendChild(catTitle);
+        container.appendChild(grid);
+      });
+    } else {
       const grid = document.createElement('div');
       grid.className = 'route-grid';
-
-      grid.innerHTML = grouped[cat].map(r => {
-        // ナンバリング画像の複数対応（カンマやスペース区切りで複数指定可能）
-        const numVal = r.numbering ? r.numbering.trim() : '';
-        let symbolsHTML = '';
-        if (numVal && numVal !== '-') {
-          const codes = numVal.split(/[,、\s]+/).filter(Boolean);
-          symbolsHTML = codes.map(code => `<img src="${code}.png" alt="${code}" class="route-symbol" onerror="this.style.display='none'">`).join('');
-        }
-        const imgContainerTag = symbolsHTML ? `<div class="route-symbols-container">${symbolsHTML}</div>` : '';
-
-        const isPrep = r.preparation && r.preparation.trim() !== '' && r.preparation !== 'FALSE' && r.preparation !== false;
-
-        const hasFullOpening = r.full_opening_date && r.full_opening_date.trim() !== '' && r.full_opening_date.trim() !== '-';
-        const fullOpeningHTML = hasFullOpening ? `
-          <div class="spec-item"><span class="spec-label">全通年月日</span><span class="spec-val">${formatDate(r.full_opening_date)}</span></div>
-        ` : '';
-
-        const cardContent = isPrep ? `
-          <div class="prep-message">⏳ 準備中です</div>
-        ` : `
-          <div class="specs-grid">
-            <div class="spec-item"><span class="spec-label">営業キロ</span><span class="spec-val">${r.distance || '-'}</span></div>
-            <div class="spec-item"><span class="spec-label">駅数</span><span class="spec-val">${r.station_count || '-'}</span></div>
-            <div class="spec-item"><span class="spec-label">平均駅間距離</span><span class="spec-val">${r.avg_distance || '-'}</span></div>
-            <div class="spec-item"><span class="spec-label">最高速度</span><span class="spec-val">${r.max_speed || '-'}</span></div>
-            <div class="spec-item"><span class="spec-label">開業年月日</span><span class="spec-val">${formatDate(r.opening_date)}</span></div>
-            ${fullOpeningHTML}
-          </div>
-        `;
-
-        return `
-          <a href="${isPrep ? '#' : (r.html_file || '#')}" class="route-card ${isPrep ? 'prep' : ''}">
-            <div>
-              <div class="route-header">
-                <div class="route-info">
-                  ${imgContainerTag}
-                  <div class="route-text-area">
-                    <div class="route-name">${r.line_name || '-'}</div>
-                    ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
-                  </div>
-                </div>
-                ${isPrep ? '' : '<div class="arrow">›</div>'}
-              </div>
-              ${cardContent}
-            </div>
-          </a>
-        `;
-      }).join('');
-
-      container.appendChild(catTitle);
+      grid.innerHTML = filtered.map(r => buildRouteCardHTML(r)).join('');
       container.appendChild(grid);
-    });
+    }
+  }
+
+  function buildRouteCardHTML(r) {
+    const isPrep = r.preparation && r.preparation.trim() !== '' && r.preparation !== 'FALSE' && r.preparation !== false;
+
+    // 路線カラーの取得（未設定や「-」の場合はデフォルト色にフォールバック）
+    const lineColor = r.line_color && r.line_color.trim() !== '' && r.line_color.trim() !== '-' ? r.line_color.trim() : '';
+
+    const numVal = r.numbering ? r.numbering.trim() : '';
+    let symbolsHTML = '';
+    if (numVal && numVal !== '-') {
+      const codes = numVal.split(/[,、\s]+/).filter(Boolean);
+      symbolsHTML = codes.map(code => `<img src="${code}.png" alt="${code}" class="route-symbol" onerror="this.style.display='none'">`).join('');
+    }
+    const imgContainerTag = symbolsHTML ? `<div class="route-symbols-container">${symbolsHTML}</div>` : '';
+
+    const hasFullOpening = r.full_opening_date && r.full_opening_date.trim() !== '' && r.full_opening_date.trim() !== '-';
+    const fullOpeningHTML = hasFullOpening ? `
+      <div class="spec-item"><span class="spec-label">全通年月日</span><span class="spec-val">${formatDate(r.full_opening_date)}</span></div>
+    ` : '';
+
+    const cardContent = isPrep ? `
+      <div class="prep-message">⏳ 準備中です</div>
+    ` : `
+      <div class="specs-grid">
+        <div class="spec-item"><span class="spec-label">営業キロ</span><span class="spec-val">${r.distance || '-'}</span></div>
+        <div class="spec-item"><span class="spec-label">駅数</span><span class="spec-val">${r.station_count || '-'}</span></div>
+        <div class="spec-item"><span class="spec-label">平均駅間距離</span><span class="spec-val">${r.avg_distance || '-'}</span></div>
+        <div class="spec-item"><span class="spec-label">最高速度</span><span class="spec-val">${r.max_speed || '-'}</span></div>
+        <div class="spec-item"><span class="spec-label">開業年月日</span><span class="spec-val">${formatDate(r.opening_date)}</span></div>
+        ${fullOpeningHTML}
+      </div>
+    `;
+
+    const noticeText = r.notice && r.notice.trim() !== '' && r.notice.trim() !== '-' ? r.notice.trim() : '';
+    let noticeSectionHTML = '';
+    if (noticeText && !isPrep) {
+      noticeSectionHTML = `
+        <div class="route-notice-box" onclick="event.stopPropagation()">
+          <button class="notice-toggle-btn" onclick="toggleCardNotice(event, this)">お知らせ・運行情報あり</button>
+          <div class="card-notice-content">${noticeText}</div>
+        </div>
+      `;
+    }
+
+    const cardLink = isPrep ? '#' : (r.html_file || '#');
+    // インラインスタイルで路線カラーを左ボーダーに適用
+    const styleAttr = lineColor ? `style="border-left-color: ${lineColor};"` : '';
+
+    return `
+      <a href="${cardLink}" class="route-card ${isPrep ? 'prep' : ''}" ${styleAttr}>
+        <div>
+          <div class="route-header">
+            <div class="route-info">
+              ${imgContainerTag}
+              <div class="route-text-area">
+                <div class="route-name">${r.line_name || '-'}</div>
+                ${r.section_info ? `<div class="route-desc">${r.section_info}</div>` : ''}
+              </div>
+            </div>
+            ${isPrep ? '' : '<div class="arrow">›</div>'}
+          </div>
+          ${cardContent}
+        </div>
+        ${noticeSectionHTML}
+      </a>
+    `;
+  }
+
+  function toggleCardNotice(event, btn) {
+    event.preventDefault();
+    event.stopPropagation();
+    const content = btn.nextElementSibling;
+    content.classList.toggle('active');
+    btn.textContent = content.classList.contains('active') ? '▲ 運行情報を閉じる' : '⚠️ 運行情報あり';
   }
 </script>
 
